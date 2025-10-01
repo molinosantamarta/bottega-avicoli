@@ -11,7 +11,7 @@
     :root{
       --bg:#000; --fg:#fff; --border:#2c2c2e; --yellow:#ffd60a;
     }
-    .wrap{ padding:12px 12px 40px; max-width:760px; margin:0 auto; }
+    .wrap{ padding:12px 12px 96px; max-width:760px; margin:0 auto; }
 
     header{ padding:16px 16px 12px; text-align:center; border-bottom:1px solid #111; overflow:hidden; }
     header h1{
@@ -41,11 +41,60 @@
 
     .panel{
       margin:20px auto 0; max-width:760px; border:1px solid var(--border);
-      background:#0b0b0b; border-radius:12px; padding:14px; text-align:center;
+      background:#0b0b0b; border-radius:12px; padding:20px; text-align:center;
     }
     .muted{ color:#bbb; opacity:.85; }
 
-    .sr-only{ position:absolute!important; height:1px;width:1px;overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+    /* Viste SPA */
+    [data-view]{ display:none; }
+    [data-view].active{ display:block; animation: fade .18s ease-out; }
+    @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+    /* Tabbar in basso */
+    .tabbar{
+      position:fixed; left:0; right:0; bottom:0;
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+      padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+      background:rgba(16,16,18,.8); backdrop-filter:saturate(180%) blur(14px);
+      border-top:1px solid var(--border);
+    }
+    .tab{
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      padding:8px; border-radius:10px; color:#bbb; text-decoration:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .2s, color .2s;
+    }
+    .tab[aria-selected="true"]{ color:#fff; background:rgba(255,214,10,.2); }
+    .tab .lbl{ font-size:12px; }
+      /* Viste SPA */
+    [data-view]{ display:none; }
+    [data-view].active{ display:block; animation: fade .18s ease-out; }
+    @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+    /* Tabbar in basso */
+    .tabbar{
+      position:fixed; left:0; right:0; bottom:0;
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+      padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+      background:rgba(16,16,18,.8); backdrop-filter:saturate(180%) blur(14px);
+      border-top:1px solid var(--border);
+    }
+    .tab{
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      padding:10px; border-radius:12px; color:#bbb; text-decoration:none; cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .2s, color .2s, transform .05s ease-in-out;
+    }
+    .tab:active{ transform:scale(.98); }
+    .tab[aria-selected="true"]{ color:#fff; background:rgba(255,214,10,.2); }
+    .tab .lbl{ font-size:12px; }
+
+    /* Demo box per differenziare visivamente le pagine */
+    .demo{ display:grid; gap:12px; }
+    .box{ border:1px dashed #333; border-radius:12px; padding:18px; text-align:center; }
+    .box.oggi{ background:linear-gradient(180deg, rgba(255,0,0,.08), rgba(0,0,0,0)); }
+    .box.sett{ background:linear-gradient(180deg, rgba(0,153,255,.08), rgba(0,0,0,0)); }
+    .box.tot{  background:linear-gradient(180deg, rgba(255,214,10,.08), rgba(0,0,0,0)); }
   </style>
 </head>
 <body>
@@ -59,51 +108,72 @@
   </header>
 
   <div class="wrap">
-    <section class="panel">
-      <div class="muted">Pagina in costruzione</div>
+    <!-- Vista: Oggi -->
+    <section id="view-oggi" data-view class="active">
+      <section class="panel"><b>Oggi</b><div class="muted">Pagina in costruzione</div></section>
+      <div class="demo">
+        <div class="box oggi">FAKE PAGE • Contenuto dimostrativo per la vista <b>Oggi</b>.</div>
+      </div>
+    </section>
+
+    <!-- Vista: Settimana -->
+    <section id="view-settimana" data-view>
+      <section class="panel"><b>Settimana</b><div class="muted">Pagina in costruzione</div></section>
+      <div class="demo">
+        <div class="box sett">FAKE PAGE • Contenuto dimostrativo per la vista <b>Settimana</b>.</div>
+      </div>
+    </section>
+
+    <!-- Vista: Totali -->
+    <section id="view-totali" data-view>
+      <section class="panel"><b>Totali</b><div class="muted">Pagina in costruzione</div></section>
+      <div class="demo">
+        <div class="box tot">FAKE PAGE • Contenuto dimostrativo per la vista <b>Totali</b>.</div>
+      </div>
     </section>
   </div>
 
+  <!-- Tabbar in basso -->
+  <nav class="tabbar" role="tablist" aria-label="Navigazione viste">
+    <a class="tab" role="tab" href="#oggi" data-tab="oggi" aria-selected="true"><div>📅</div><div class="lbl">Oggi</div></a>
+    <a class="tab" role="tab" href="#settimana" data-tab="settimana" aria-selected="false"><div>🗓️</div><div class="lbl">Settimana</div></a>
+    <a class="tab" role="tab" href="#totali" data-tab="totali" aria-selected="false"><div>📊</div><div class="lbl">Totali</div></a>
+  </nav>
+
   <script>
-    // Bootstrap data layer — NON renderizza nulla a schermo per ora.
-    // Inserisci qui il “loader” del tuo Google Sheet. Hai due strade:
+    const VIEWS = ['oggi','settimana','totali'];
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-    // 1) PUBBLICA il foglio come CSV e usa fetch() su quell’URL.
-    //    File -> Condividi -> Pubblica sul web -> Seleziona foglio -> CSV
-    //    Poi sostituisci SHEET_PUBLISHED_CSV con l’URL CSV pubblicato.
-    const SHEET_PUBLISHED_CSV = null; // es: "https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv"
-
-    // 2) Oppure usa la Google Sheets API (serve API key + sheetId + range).
-    //    const API_KEY = "XXX";
-    //    const SHEET_ID = "1Z8cPY_JvFsIgt-vli10gAqPJm9EDHZTuKk_BC_wzoAQ";
-    //    const RANGE = "Foglio1!A1:Z999";
-    //    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
-
-    // N.B. Il link “edit?usp=sharing” NON è direttamente fetchabile per CORS.
-    // Per ora, prepariamo solo la logica “silent”:
-
-    async function loadDataSilently(){
-      try{
-        if (SHEET_PUBLISHED_CSV){
-          const res = await fetch(SHEET_PUBLISHED_CSV, { cache:'no-store' });
-          if (!res.ok) throw new Error('CSV non raggiungibile');
-          const text = await res.text();
-          // parse CSV se vuoi (per ora non mostriamo nulla)
-          // console.log('CSV length:', text.length);
-        } else {
-          // Placeholder per la modalità API (commentata):
-          // const res = await fetch(url);
-          // const json = await res.json();
-          // console.log('Rows:', json.values?.length);
-        }
-      }catch(err){
-        // Silenzioso: niente UI, solo log
-        console.warn('Sheets bootstrap warning:', err.message);
-      }
+    function activate(view){
+      if (!VIEWS.includes(view)) view = 'oggi';
+      VIEWS.forEach(v => {
+        const el = document.getElementById('view-'+v);
+        if (el) el.classList.toggle('active', v===view);
+      });
+      $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab===view ? 'true' : 'false'));
     }
 
-    // Avvio silenzioso
-    loadDataSilently();
+    function onHashChange(){
+      const view = (location.hash || '#oggi').replace('#','');
+      activate(view);
+    }
+
+    // Click handler robusto (funziona anche se l'hash non cambia per limiti dell'embed)
+    document.querySelector('.tabbar').addEventListener('click', (e) => {
+      const a = e.target.closest('.tab');
+      if (!a) return;
+      e.preventDefault();
+      const view = a.dataset.tab;
+      history.replaceState(null, '', '#'+view);
+      activate(view);
+    });
+
+    window.addEventListener('hashchange', onHashChange);
+
+    // Init: forza una vista valida
+    if (!location.hash) { history.replaceState(null, '', '#oggi'); }
+    onHashChange();
   </script>
 </body>
 </html>
