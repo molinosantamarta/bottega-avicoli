@@ -1,8 +1,7 @@
 {
   "name": "Ocapì - Avicoli Macello",
   "short_name": "Ocapì",
-  "start_url": "/bottega-avicoli
-/index.html",
+  "start_url": "/bottega-avicoli/index.html",
   "display": "standalone",
   "background_color": "#770505",
   "theme_color": "#770505",
