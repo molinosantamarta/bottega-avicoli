@@ -1,198 +1,141 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <!-- PWA manifest (minimal, edge-to-edge) -->
-<link rel="manifest" href="/bottega-avicoli/site.webmanifest">
-<meta name="theme-color" content="#770505">
-
-<!-- iOS / iPadOS (edge-to-edge) -->
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="apple-touch-icon" sizes="115x115" href="/apple-touch-icon-115x115.png">
-<link rel="apple-touch-icon" sizes="147x147" href="/apple-touch-icon-147x147.png">
-<link rel="apple-touch-icon" sizes="161x161" href="/apple-touch-icon-161x161.png">
-<link rel="apple-touch-icon" sizes="174x174" href="/apple-touch-icon-174x174.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Stòc">
-
-<!-- Favicons -->
-<link rel="icon" type="image/png" sizes="32x32" href="/icon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icon-16x16.png">
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Ocapì - Avicoli Macello</title>
+  <title>Master</title>
   <style>
-    html, body { height:100%; background:#000; }
-    body { margin:0; font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif; color:#fff; }
-
+    html,body{height:100%;margin:0}
     :root{
-      --bg:#000; --fg:#fff; --border:#2c2c2e; --yellow:#ffd60a;
+      --main:#770505; --fg:#f5f5f7; --radius:14px;
     }
-    .wrap{ padding:12px 12px 96px; max-width:760px; margin:0 auto; }
-
-    header{ padding:16px 16px 12px; text-align:center; border-bottom:1px solid #111; overflow:hidden; }
-    header h1{
-      margin:0; font-size:21px; font-weight:900; line-height:1.3; color:transparent;
-      background:linear-gradient(90deg, #ff0000 0%, #ff9900 25%, #ffff00 50%, #ff9900 75%, #ff0000 100%);
-      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
-      background-size:300% 100%; animation:radar 8s linear infinite;
-    }
-    @keyframes radar{0%{background-position:0% 50%}50%{background-position:200% 50%}100%{background-position:0% 50%}}
-
-    .subtitle{ margin-top:6px; font-size:15px; font-weight:600; color:#ddd; opacity:.9; }
-
-    .beta-row{ display:flex; justify-content:center; margin-top:14px; }
-    .beta-pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:6px 10px; border-radius:999px;
-      background:var(--yellow); color:#000; font-weight:800; font-size:12px;
-      box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 4px 12px rgba(0,0,0,.25);
-      border:1px solid #e6c408; letter-spacing:.2px;
+    body{
+      background:var(--main);
+      color:var(--fg);
+      font:16px/1.4 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;
+      display:flex;flex-direction:column;min-height:100vh;
     }
 
-    .hero{ display:flex; align-items:center; justify-content:center; margin:16px 0 10px; }
-    .hero img{
-      width:56%; max-width:520px; height:auto; display:block; border-radius:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    header{
+      background:var(--main);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:20px;
+      padding:12px 0 8px;
     }
+    header img{
+      height:52px;width:auto;display:block;
+    }
+
+    nav[role="tablist"]{
+      position:sticky;top:0;z-index:20;
+      background:var(--main);
+      display:flex;justify-content:center;gap:8px;
+      padding:12px 8px 16px;
+    }
+    .tab{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.25);
+      background:transparent;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      letter-spacing:.2px;
+      transition:transform .05s ease,background .2s,color .2s,border-color .2s;
+    }
+    .tab:hover{background:rgba(255,255,255,.15)}
+    .tab:active{transform:scale(.98)}
+    .tab[aria-selected="true"]{background:#fff;color:var(--main);border-color:#fff}
+
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+    [data-view]{display:none;width:100%;height:100%;}
+    [data-view].active{display:flex;animation:fade .18s ease-out;}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
     .panel{
-      margin:20px auto 0; max-width:760px; border:1px solid var(--border);
-      background:#0b0b0b; border-radius:12px; padding:20px; text-align:center;
+      flex:1;
+      background:#fff;
+      color:#000;
+      border-radius:var(--radius);
+      min-height:70vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:32px;
+      font-weight:700;
+      box-shadow:0 0 20px rgba(0,0,0,.3);
+      overflow:hidden;
     }
-    .muted{ color:#bbb; opacity:.85; }
-
-    /* Viste SPA */
-    [data-view]{ display:none; }
-    [data-view].active{ display:block; animation: fade .18s ease-out; }
-    @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-
-    /* Tabbar in basso */
-    .tabbar{
-      position:fixed; left:0; right:0; bottom:0;
-      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
-      padding:8px 12px calc(8px + env(safe-area-inset-bottom));
-      background:rgba(16,16,18,.8); backdrop-filter:saturate(180%) blur(14px);
-      border-top:1px solid var(--border);
+    .panel iframe{
+      width:100%;
+      height:100%;
+      border:0;
     }
-    .tab{
-      display:flex; flex-direction:column; align-items:center; gap:2px;
-      padding:8px; border-radius:10px; color:#bbb; text-decoration:none;
-      -webkit-tap-highlight-color: transparent;
-      transition: background .2s, color .2s;
-    }
-    .tab[aria-selected="true"]{ color:#fff; background:rgba(255,214,10,.2); }
-    .tab .lbl{ font-size:12px; }
-      /* Viste SPA */
-    [data-view]{ display:none; }
-    [data-view].active{ display:block; animation: fade .18s ease-out; }
-    @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-
-    /* Tabbar in basso */
-    .tabbar{
-      position:fixed; left:0; right:0; bottom:0;
-      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
-      padding:8px 12px calc(8px + env(safe-area-inset-bottom));
-      background:rgba(16,16,18,.8); backdrop-filter:saturate(180%) blur(14px);
-      border-top:1px solid var(--border);
-    }
-    .tab{
-      display:flex; flex-direction:column; align-items:center; gap:2px;
-      padding:10px; border-radius:12px; color:#bbb; text-decoration:none; cursor:pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: background .2s, color .2s, transform .05s ease-in-out;
-    }
-    .tab:active{ transform:scale(.98); }
-    .tab[aria-selected="true"]{ color:#fff; background:rgba(255,214,10,.2); }
-    .tab .lbl{ font-size:12px; }
-
-    /* Demo box per differenziare visivamente le pagine */
-    .demo{ display:grid; gap:12px; }
-    .box{ border:1px dashed #333; border-radius:12px; padding:18px; text-align:center; }
-    .box.oggi{ background:linear-gradient(180deg, rgba(255,0,0,.08), rgba(0,0,0,0)); }
-    .box.sett{ background:linear-gradient(180deg, rgba(0,153,255,.08), rgba(0,0,0,0)); }
-    .box.tot{  background:linear-gradient(180deg, rgba(255,214,10,.08), rgba(0,0,0,0)); }
   </style>
 </head>
 <body>
   <header>
-    <h1>Ocapì - Avicoli Macello</h1>
-    <div class="subtitle">Avicoli prenotati da macellare nelle festività natalizie</div>
-    <div class="beta-row"><span class="beta-pill">Beta 1</span></div>
-    <div class="hero">
-      <img src="https://static.wixstatic.com/media/9d749b_ccdf4c6f024b477884a2f3ed7ce26053~mv2.png" alt="Avicoli" />
-    </div>
+    <img src="svg-molino.png" alt="Molino" />
+    <img src="svg-bottega.png" alt="Bottega" />
+    <img src="svg-cascina.png" alt="Cascina" />
   </header>
 
-  <div class="wrap">
-    <!-- Vista: Oggi -->
-    <section id="view-oggi" data-view class="active">
-      <section class="panel"><b>Oggi</b><div class="muted">Pagina in costruzione</div></section>
-      <div class="demo">
-        <div class="box oggi">FAKE PAGE • Contenuto dimostrativo per la vista <b>Oggi</b>.</div>
-      </div>
-    </section>
-
-    <!-- Vista: Settimana -->
-    <section id="view-settimana" data-view>
-      <section class="panel"><b>Settimana</b><div class="muted">Pagina in costruzione</div></section>
-      <div class="demo">
-        <div class="box sett">FAKE PAGE • Contenuto dimostrativo per la vista <b>Settimana</b>.</div>
-      </div>
-    </section>
-
-    <!-- Vista: Totali -->
-    <section id="view-totali" data-view>
-      <section class="panel"><b>Totali</b><div class="muted">Pagina in costruzione</div></section>
-      <div class="demo">
-        <div class="box tot">Avicoli Macello - AV <b>Totali</b>.</div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Tabbar in basso -->
-  <nav class="tabbar" role="tablist" aria-label="Navigazione viste">
-    <a class="tab" role="tab" href="#oggi" data-tab="oggi" aria-selected="true"><div>📅</div><div class="lbl">Oggi</div></a>
-    <a class="tab" role="tab" href="#settimana" data-tab="settimana" aria-selected="false"><div>🗓️</div><div class="lbl">Settimana</div></a>
-    <a class="tab" role="tab" href="#totali" data-tab="totali" aria-selected="false"><div>📊</div><div class="lbl">Totali</div></a>
+  <nav class="tabs" role="tablist" aria-label="Navigazione viste">
+    <button class="tab" role="tab" data-tab="inserisci" aria-selected="true">Inserisci</button>
+    <button class="tab" role="tab" data-tab="gestisci" aria-selected="false">Gestisci</button>
+    <button class="tab" role="tab" data-tab="stoc" aria-selected="false">Stòc</button>
+    <button class="tab" role="tab" data-tab="ocapi" aria-selected="false">Ocapì</button>
+    <button class="tab" role="tab" data-tab="trua" aria-selected="false">Truà</button>
   </nav>
 
+  <main>
+    <section id="view-inserisci" data-view class="active" aria-labelledby="tab-inserisci">
+      <div class="panel">
+        <iframe src="https://www.molinosantamarta.it/ordini-bottega" title="Molino Santa Marta"></iframe>
+      </div>
+    </section>
+    <section id="view-gestisci" data-view aria-labelledby="tab-gestisci">
+      <div class="panel">
+        <iframe src="https://docs.google.com/spreadsheets/d/1Z8cPY_JvFsIgt-vli10gAqPJm9EDHZTuKk_BC_wzoAQ/edit?gid=0#gid=0"></iframe>
+      </div>
+    </section>
+    <section id="view-stoc" data-view aria-labelledby="tab-stoc">
+      <div class="panel">"Stòc"</div>
+    </section>
+    <section id="view-ocapi" data-view aria-labelledby="tab-ocapi">
+      <div class="panel">"Ocapì"</div>
+    </section>
+    <section id="view-trua" data-view aria-labelledby="tab-trua">
+      <div class="panel">"Truà"</div>
+    </section>
+  </main>
+
   <script>
-    const VIEWS = ['oggi','settimana','totali'];
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const VIEWS=["inserisci","gestisci","stoc","ocapi","trua"];
+    const $$=(s)=>Array.from(document.querySelectorAll(s));
 
     function activate(view){
-      if (!VIEWS.includes(view)) view = 'oggi';
-      VIEWS.forEach(v => {
-        const el = document.getElementById('view-'+v);
-        if (el) el.classList.toggle('active', v===view);
+      if(!VIEWS.includes(view)) view='inserisci';
+      VIEWS.forEach(v=>{
+        const el=document.getElementById('view-'+v);
+        if(!el) return;
+        el.classList.toggle('active',v===view);
       });
-      $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab===view ? 'true' : 'false'));
+      $$('.tab').forEach(btn=>btn.setAttribute('aria-selected',btn.dataset.tab===view?'true':'false'));
     }
 
-    function onHashChange(){
-      const view = (location.hash || '#oggi').replace('#','');
-      activate(view);
-    }
-
-    // Click handler robusto (funziona anche se l'hash non cambia per limiti dell'embed)
-    document.querySelector('.tabbar').addEventListener('click', (e) => {
-      const a = e.target.closest('.tab');
-      if (!a) return;
-      e.preventDefault();
-      const view = a.dataset.tab;
-      history.replaceState(null, '', '#'+view);
-      activate(view);
+    document.querySelector('[role="tablist"]').addEventListener('click',e=>{
+      const b=e.target.closest('.tab');
+      if(!b) return;
+      const v=b.dataset.tab;
+      activate(v);
     });
 
-    window.addEventListener('hashchange', onHashChange);
-
-    // Init: forza una vista valida
-    if (!location.hash) { history.replaceState(null, '', '#oggi'); }
-    onHashChange();
+    activate('inserisci');
   </script>
 </body>
 </html>
