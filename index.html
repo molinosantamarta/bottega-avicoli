@@ -1,195 +1,527 @@
 <!doctype html>
-<html lang="it" data-ocapi>
+<html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>OcaPì – Totali avicoli</title>
-  <style>
-    :root{
-      --bg:#0a0a0b; --panel:#1c1e22; --panel-soft:#181a1e; --fg:#f7f7f8; --muted:#b8b9bd; --hi:#ffd60a;
-      --oc:#3b82f6; --an:#e94242; --cap:#f1b000; --ok:#34c759;
-      --inc:#34c759; --dec:#ff6b6b;
-      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35); --shadow-soft:0 6px 18px rgba(0,0,0,.25);
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg);padding:12px;display:flex;flex-direction:column;align-items:center;gap:12px}
-    .panel{background:var(--panel);border-radius:var(--radius);padding:22px 18px 24px;box-shadow:var(--shadow);max-width:420px;width:100%;display:grid;gap:18px}
-    .panel.soft{background:var(--panel-soft);box-shadow:var(--shadow-soft)}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dashboard Avicoli — Blocchi Integrati</title>
 
-    .panel-header{text-align:center;margin-bottom:4px}
-    .panel-header h1{font-size:18px;font-weight:800;color:var(--hi);text-transform:uppercase;letter-spacing:.4px;line-height:1.3}
-    .panel-header p{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.2px;margin-top:2px}
+<!-- ====== STILI GLOBALI MINIMI (non interferenti) ====== -->
+<style>
+  html, body { height:100%; }
+  body{
+    margin:0; background:#0a0a0b; color:#f5f5f7;
+    font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+  .block { padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .block + .block { border-top:1px solid #232429; margin-top:8px; padding-top:24px; }
+  .block h1.block-title{
+    margin:0 0 8px; font-size:14px; font-weight:800; letter-spacing:.3px;
+    color:#c6c9cf; text-transform:uppercase; opacity:.75;
+  }
+</style>
 
-    .bars{display:grid;gap:12px}
-    .row{display:grid;grid-template-columns:88px 1fr 64px;align-items:center;gap:8px}
-    .lbl{font-weight:700;font-size:15px;letter-spacing:.25px;color:#fff;text-transform:uppercase;text-align:left}
-    .bar{height:20px;border-radius:10px;background:#121316;overflow:hidden;position:relative;border:1px solid #0e0f11}
-    .bar b{display:block;height:100%;border-radius:inherit;box-shadow:inset 0 0 0 1px #fff2;width:0}
-    .oche b{background:linear-gradient(90deg,var(--oc),#a0c0ff)}
-    .anatre b{background:linear-gradient(90deg,var(--an),#ffadad)}
-    .capponi b{background:linear-gradient(90deg,var(--cap),#ffe08f)}
-    .polli b{background:linear-gradient(90deg,var(--ok),#a8f5bd)}
-    .val{text-align:right;font-weight:800;font-size:22px;color:#fff}
+<!-- ====== BLOCCO 1: Agenda Macellazione — Navigazione Settimane (scopato in #agenda) ====== -->
+<style>
+  #agenda { --bg:#0b0b0c; --panel:#16181c; --border:#2b2d31; --text:#f5f5f7; --accent:#ffd60a; --muted:#9ea1a5; --radius:10px; --shadow:0 6px 18px rgba(0,0,0,.35); }
+  #agenda .a-root{background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;}
+  #agenda .a-root h1{font-size:18px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin:0}
 
-    .divider{height:1px;background:#2b2c30;margin:8px 0 0;border:none;opacity:.7}
-    .cut{height:1px;background:#3a3b40;margin:8px 0;border:none;opacity:.9}
+  #agenda .week-nav{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px 10px;box-shadow:var(--shadow)}
+  #agenda .btn{appearance:none;border:1px solid var(--border);background:#121317;color:var(--text);border-radius:10px;padding:6px 10px;font-weight:800;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;min-width:36px}
+  #agenda .btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+  #agenda .btn:focus{outline:2px solid var(--accent);outline-offset:2px}
+  #agenda .btn:active{transform:translateY(1px)}
+  #agenda .range{font-weight:800;letter-spacing:.3px}
 
-    .totale-wrapper{text-align:center;display:grid;gap:8px;margin-top:0}
-    .totale-header{display:flex;justify-content:center;align-items:baseline;gap:6px;position:relative;top:-10px}
-    .totale-header .label{text-transform:uppercase;font-size:12px;font-weight:700;letter-spacing:.2px;color:#a7a7aa}
-    .totale-header .count{font-size:38px;font-weight:900;color:var(--hi)}
+  #agenda .table-wrap{width:100%;max-width:640px;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;border:1px solid var(--border)}
+  #agenda table{width:100%;border-collapse:collapse;text-align:center;font-size:13px;table-layout:fixed}
+  #agenda th,#agenda td{padding:6px 3px;border-bottom:1px solid var(--border);border-right:1px solid rgba(255,255,255,0.05);white-space:nowrap;text-align:center;vertical-align:middle}
+  #agenda tr td:last-child, #agenda tr th:last-child{border-right:none}
+  #agenda th{background:rgba(255,214,10,.08);color:var(--accent);font-weight:800;text-transform:uppercase;font-size:11px;position:sticky;top:0;z-index:1;text-align:center}
+  #agenda thead th:first-child{width:10%;text-align:center}
+  #agenda tbody tr:nth-child(even){background:#1a1c20}
+  #agenda tbody td{font-weight:700;text-align:center}
+  #agenda tbody td:first-child{color:var(--accent);font-weight:900;text-align:center;font-size:11px}
 
-    .secondary{display:grid;gap:10px}
-    .totale-line{display:flex;align-items:baseline;justify-content:center;gap:8px}
-    .totale-line .val{font-size:22px;font-weight:800;color:#fff;line-height:1.1}
-    .totale-line .subtext{text-transform:uppercase;font-size:12px;font-weight:700;letter-spacing:.2px;color:#a7a7aa;position:relative;top:-4px}
+  #agenda tfoot tr{background:#16181c;text-align:center}
+  #agenda tfoot td{border-top:1px solid var(--border);border-bottom:none;color:var(--text);text-align:center}
 
-    .record-wrap{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
-    .record-bar{width:70%;height:10px;background:#1a1c20;border-radius:10px;overflow:hidden;border:1px solid #111318}
-    .record-bar b{display:block;height:100%;background:linear-gradient(90deg,var(--hi),#ffe88a);width:0;border-radius:inherit;transform-origin:left center}
-    .record-wrap .target{font-size:12px;font-weight:700;color:#a7a7aa;line-height:1}
+  #agenda td>.v, #agenda tfoot td>.v{display:inline-block;min-width:1.6em;padding:2px 5px;border:1px solid var(--border);border-radius:6px;line-height:1.1;font-weight:800;font-size:12px;text-align:center;color:var(--text);background-color:rgba(255,214,10,0.12)}
 
-    /* BLOCCO CONFRONTO EVOLUTIVO 2023 / 2024 / 2025 */
-    .evo{display:grid;gap:12px;margin-top:4px}
-    .evo h3{font-size:12px;color:#a7a7aa;text-transform:uppercase;font-weight:800;letter-spacing:.28px;text-align:left}
-    .evo-row{display:grid;grid-template-columns:88px 1fr auto;align-items:center;gap:8px}
-    .evo-row.oche{--cat:var(--oc)}
-    .evo-row.anatre{--cat:var(--an)}
-    .evo-row.capponi{--cat:var(--cap)}
-    .evo-row.polli{--cat:var(--ok)}
-    .evo-bars{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-    .evo-bars .seg{height:8px;border-radius:10px;overflow:hidden;background:var(--cat);opacity:.35;width:0}
-    .evo-bars .seg.y24{opacity:.6}
-    .evo-bars .seg.y25{opacity:1}
-    .evo-val{font-size:13px;color:#cfd0d3;font-weight:700;text-align:right}
-    .evo-val .pct{font-weight:800;margin-left:6px}
-    .evo-val .pct.inc{color:var(--inc)}
-    .evo-val .pct.dec{color:var(--dec)}
+  #agenda .summary{max-width:640px;width:100%;color:var(--muted);font-size:15px;text-align:center;line-height:1.5;margin-top:8px}
+  #agenda .summary .line{opacity:0;transform:translateY(6px);display:inline-block;animation:fadeUpAgenda .5s forwards}
+  @keyframes fadeUpAgenda{to{opacity:1;transform:translateY(0)}}
 
-    @media (max-width:430px){
-      body{padding:10px}
-      .panel{padding:18px 14px}
-      .panel-header h1{font-size:16px}
-      .panel-header p{font-size:12px}
-      .lbl{font-size:14px}
-      .row{grid-template-columns:78px 1fr 58px}
-      .bar{height:18px}
-      .val{font-size:20px}
-      .totale-header .count{font-size:32px}
-      .totale-line .val{font-size:28px}
-    }
-  </style>
+  @media(max-width:560px){
+    #agenda .a-root{padding:10px}
+    #agenda table{font-size:10px}
+    #agenda th,#agenda td{padding:3px 2px}
+    #agenda thead th:first-child{width:12%}
+    #agenda .btn{min-width:32px;padding:6px 8px}
+    #agenda .range{font-size:13px}
+  }
+</style>
+
+<!-- ====== BLOCCO 2: Avicoli prenotati (scopato in [data-ocapi]) ====== -->
+<style>
+  [data-ocapi]{
+    --bg:#0a0a0b; --panel:#14161a; --panel-2:#1a1d22; --fg:#f3f4f5; --muted:#a7abb1; --hair:#262a30; --accent:#f2cf57;
+    --oc:#5a8fe3; --an:#d85b5b; --cap:#dcb24a; --ok:#4eb872; --radius:14px; --shadow:0 12px 36px rgba(0,0,0,.38);
+  }
+  [data-ocapi] .panel{
+    background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);
+    max-width:460px;width:100%;padding:20px 16px;display:grid;gap:16px
+  }
+  [data-ocapi] .panel-header{text-align:center;display:grid;gap:8px;margin-bottom:8px}
+  [data-ocapi] .panel-header h1{font-size:22px;font-weight:900;color:var(--accent);line-height:1.3;letter-spacing:.25px;margin:0}
+  [data-ocapi] .panel-header h2{font-size:15px;font-weight:700;color:var(--fg);opacity:.9;letter-spacing:.2px;margin:0}
+
+  [data-ocapi] .bars{display:grid;gap:14px}
+  [data-ocapi] .row{display:grid;grid-template-columns:110px 1fr 76px;align-items:center;gap:10px}
+  [data-ocapi] .lbl{font-weight:800;font-size:16px;color:#e6e8ea;text-transform:uppercase;opacity:.95}
+
+  [data-ocapi] .bar{height:22px;border-radius:12px;background:#0f1114;border:1px solid #0b0d11;overflow:hidden}
+  [data-ocapi] .bar b{display:block;height:100%;width:0;border-radius:inherit}
+  [data-ocapi] .oche b{background:var(--oc)}
+  [data-ocapi] .anatre b{background:var(--an)}
+  [data-ocapi] .capponi b{background:var(--cap)}
+  [data-ocapi] .polli b{background:var(--ok)}
+  [data-ocapi] .val{font-size:22px;font-weight:900;text-align:right;color:#ffffff;font-variant-numeric:tabular-nums}
+
+  [data-ocapi] .ribbon{background:var(--panel-2);border:1px solid var(--hair);border-radius:12px;padding:10px 12px;display:flex;justify-content:center;align-items:center;gap:8px;text-align:center}
+  [data-ocapi] .ribbon .label{font-size:14px;font-weight:800;letter-spacing:.3px;color:#c2c5c9;text-transform:uppercase}
+  [data-ocapi] .ribbon .count{font-size:24px;font-weight:900;color:var(--accent);line-height:1}
+
+  @media (max-width:430px){
+    [data-ocapi] .panel{padding:16px 12px}
+    [data-ocapi] .panel-header h1{font-size:20px}
+    [data-ocapi] .panel-header h2{font-size:14px}
+    [data-ocapi] .row{grid-template-columns:98px 1fr 64px}
+    [data-ocapi] .bar{height:20px}
+    [data-ocapi] .val{font-size:20px}
+    [data-ocapi] .ribbon .count{font-size:22px}
+    [data-ocapi] .lbl{font-size:15px}
+  }
+</style>
+
+<!-- ====== BLOCCO 3: Avanzamento 2025 e Confronti (scopato in #avanz) ====== -->
+<style>
+  #avanz{
+    --bg:#0a0a0b; --panel:#14161a; --panel-2:#1a1d22; --hair:#262a30; --fg:#eef0f3; --muted:#a7abb1; --hl:#f2cf57;
+    --y2025:var(--hl); --y2024:#9fa4ad; --y2023:#595e66; --radius:14px; --shadow:0 12px 36px rgba(0,0,0,.38);
+  }
+  #avanz .wrap{width:100%;max-width:520px;display:grid;gap:14px}
+  #avanz .card{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 14px;display:grid;gap:12px}
+  #avanz .hd{display:grid;gap:4px;text-align:center}
+  #avanz .hd h1{font-size:18px;font-weight:900;letter-spacing:.25px;color:var(--hl);margin:0}
+  #avanz .hd p{font-size:12.5px;color:var(--muted);margin:0}
+
+  #avanz .totale{display:grid;gap:10px}
+  #avanz .tot-row{display:flex;justify-content:space-between;align-items:baseline}
+  #avanz .tot-row .lbl{font-size:13px;color:#cfd3d8;font-weight:800;letter-spacing:.2px;text-transform:uppercase}
+  #avanz .tot-row .val{font-size:26px;font-weight:900;color:var(--hl)}
+  #avanz .progline{display:flex;align-items:center;gap:8px}
+  #avanz .prog{position:relative;height:18px;background:#0f1114;border:1px solid #0b0d11;border-radius:999px;overflow:hidden;flex:1}
+  #avanz .prog b{display:block;height:100%;width:0;background:var(--y2025);border-radius:inherit}
+  #avanz .cap{font-size:12px;color:#d8dbe0;font-weight:800}
+
+  #avanz .sect-hd{font-size:13px;font-weight:800;letter-spacing:.22px;text-transform:uppercase;color:#cfd3d8;margin-top:2px;text-align:center}
+  #avanz .rows{display:grid;gap:12px}
+  #avanz .row{display:grid;gap:6px}
+  #avanz .row .name{font-size:14px;font-weight:800;letter-spacing:.2px;color:#e9ecef}
+  #avanz .bars{display:grid;gap:6px}
+
+  #avanz .barline{display:flex;align-items:center;gap:8px}
+  #avanz .bar{height:14px;border-radius:999px;overflow:hidden;position:relative;background:#0f1114;border:1px solid #0b0d11;flex:1}
+  #avanz .bar b{display:block;height:100%;width:0}
+  #avanz .y2025 b{background:var(--y2025)}
+  #avanz .y2024 b{background:var(--y2024)}
+  #avanz .y2023 b{background:var(--y2023)}
+  #avanz .barline .tag{font-size:13px;font-weight:800;color:#cfd3d8;opacity:.9;min-width:28px;text-align:right}
+
+  #avanz .delta{font-size:12px;font-weight:800;margin-left:6px}
+  #avanz .up{color:#5ee07f} #avanz .down{color:#ff8c8c}
+
+  #avanz .legend{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:6px;font-size:13px;color:#cfd3d8;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;width:100%}
+  #avanz .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  #avanz .legend .dot.y2025{background:var(--y2025)}
+  #avanz .legend .dot.y2024{background:var(--y2024)}
+  #avanz .legend .dot.y2023{background:var(--y2023)}
+  #avanz .note{ text-align:center; font-size:11px; color:#a7abb1; margin-top:4px; }
+
+  @media (max-width:430px){
+    #avanz .hd h1{font-size:17px}
+    #avanz .tot-row .val{font-size:24px}
+    #avanz .prog{height:16px}
+    #avanz .row .name{font-size:13.5px}
+    #avanz .bar{height:13px}
+  }
+</style>
 </head>
 <body>
-  <!-- CONTENITORE 1: Situazione attuale -->
-  <section class="panel">
+
+<!-- ====== BLOCCO 1: AGENDA MACELLAZIONE ====== -->
+<section id="agenda" class="block" aria-labelledby="bl1">
+  <h1 id="bl1" class="block-title">Blocco 1 • Agenda macellazione</h1>
+  <div class="a-root" aria-label="Agenda macellazione">
+    <h1>Agenda Macellazione</h1>
+    <div class="week-nav" role="group" aria-label="Seleziona settimana">
+      <button id="prev" class="btn" type="button" aria-label="Settimana precedente" aria-disabled="false">◀</button>
+      <div class="range" id="range">—</div>
+      <button id="next" class="btn" type="button" aria-label="Settimana successiva" aria-disabled="false">▶</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="tabella">
+        <thead>
+          <tr>
+            <th></th><th>Oche</th><th>Anatre</th><th>Cap</th><th>Pol</th><th>Tot</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+
+    <p id="summary" class="summary" aria-live="polite"></p>
+    <p id="stats" class="summary" aria-live="polite"></p>
+    <p id="delta" class="summary" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- ====== BLOCCO 2: AVICOLI PRENOTATI ====== -->
+<section class="block" id="prenotati" aria-labelledby="bl2">
+  <h1 id="bl2" class="block-title">Blocco 2 • Avicoli prenotati</h1>
+  <section class="panel" aria-labelledby="titolo" data-ocapi>
     <div class="panel-header">
-      <h1>TOTALE AVICOLI PRENOTATI ANCORA DA RITIRARE</h1>
-      <p>Da oggi fino a fine festività</p>
+      <h1 id="titolo">AVICOLI PRENOTATI</h1>
+      <h2 id="date-range">Da oggi, … , a fine festività.</h2>
     </div>
 
-    <div class="bars">
-      <div class="row oche"><div class="lbl">OCHE</div><div class="bar"><b></b></div><div class="val">7</div></div>
-      <div class="row anatre"><div class="lbl">ANATRE</div><div class="bar"><b></b></div><div class="val">23</div></div>
-      <div class="row capponi"><div class="lbl">CAPPONI</div><div class="bar"><b></b></div><div class="val">3</div></div>
-      <div class="row polli"><div class="lbl">POLLI</div><div class="bar"><b></b></div><div class="val">33</div></div>
-    </div>
-
-    <hr class="divider" />
-
-    <div class="totale-wrapper">
-      <div class="totale-header">
-        <div class="label">ANCORA DA RITIRARE</div>
-        <div class="count">24</div>
+    <div class="bars" role="list">
+      <div class="row oche" role="listitem" data-val="13">
+        <div class="lbl">OCHE</div>
+        <div class="bar" aria-hidden="true"><b></b></div>
+        <div class="val">13</div>
       </div>
+      <div class="row anatre" role="listitem" data-val="23">
+        <div class="lbl">ANATRE</div>
+        <div class="bar" aria-hidden="true"><b></b></div>
+        <div class="val">23</div>
+      </div>
+      <div class="row capponi" role="listitem" data-val="16">
+        <div class="lbl">CAPPONI</div>
+        <div class="bar" aria-hidden="true"><b></b></div>
+        <div class="val">16</div>
+      </div>
+      <div class="row polli" role="listitem" data-val="33">
+        <div class="lbl">POLLI</div>
+        <div class="bar" aria-hidden="true"><b></b></div>
+        <div class="val">33</div>
+      </div>
+    </div>
+
+    <div class="ribbon" aria-live="polite" aria-label="Ancora da macellare totale">
+      <span class="label">Ancora da macellare</span>
+      <span class="count">0</span>
     </div>
   </section>
+</section>
 
-  <!-- CONTENITORE 2: Storico e confronto -->
-  <section class="panel soft">
-    <div class="secondary">
-      <div class="totale-line">
-        <div class="val">77</div>
-        <div class="subtext">AVICOLI ORDINATI</div>
+<!-- ====== BLOCCO 3: AVANZAMENTO 2025 E CONFRONTI ====== -->
+<section id="avanz" class="block" aria-labelledby="bl3">
+  <h1 id="bl3" class="block-title">Blocco 3 • Avanzamento 2025 e confronti</h1>
+  <main class="wrap">
+    <!-- Card 1: Avanzamento totale 2025 -->
+    <section class="card" id="card-total">
+      <div class="hd">
+        <h1>TOTALE AVICOLI 2025</h1>
+        <p>Tutti gli avicoli ordinati finora</p>
       </div>
-      <div class="record-wrap"><div class="record-bar"><b></b></div><span class="target">187</span></div>
-
-      <div class="evo">
-        <h3>Andamento per categoria (2023–2025)</h3>
-        <div class="evo-row oche" data-y2023="71" data-y2024="73" data-y2025="48">
-          <div class="lbl">OCHE</div>
-          <div class="evo-bars"><div class="seg y23"></div><div class="seg y24"></div><div class="seg y25"></div></div>
-          <div class="evo-val">48 <span class="pct"></span></div>
-        </div>
-        <div class="evo-row anatre" data-y2023="26" data-y2024="23" data-y2025="29">
-          <div class="lbl">ANATRE</div>
-          <div class="evo-bars"><div class="seg y23"></div><div class="seg y24"></div><div class="seg y25"></div></div>
-          <div class="evo-val">29 <span class="pct"></span></div>
-        </div>
-        <div class="evo-row capponi" data-y2023="87" data-y2024="71" data-y2025="58">
-          <div class="lbl">CAPPONI</div>
-          <div class="evo-bars"><div class="seg y23"></div><div class="seg y24"></div><div class="seg y25"></div></div>
-          <div class="evo-val">58 <span class="pct"></span></div>
-        </div>
-        <div class="evo-row polli" data-y2023="20" data-y2024="21" data-y2025="64">
-          <div class="lbl">POLLI</div>
-          <div class="evo-bars"><div class="seg y23"></div><div class="seg y24"></div><div class="seg y25"></div></div>
-          <div class="evo-val">64 <span class="pct"></span></div>
-        </div>
+      <div class="totale">
+        <div class="tot-row"><span class="lbl">Totale 2025</span><span class="val" id="tot2025">0</span></div>
+        <div class="progline"><div class="prog"><b id="progFill"></b></div><span class="cap" id="capRecord">204</span></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <script>
-    // Barre categoria (contenitore 1) animate in base al numero a destra
-    const rows = Array.from(document.querySelectorAll('.bars .row'));
-    const values = rows.map(r => parseInt(r.querySelector('.val').textContent.trim(), 10) || 0);
-    const max = Math.max(...values, 1);
-    rows.forEach(r => {
-      const v = parseInt(r.querySelector('.val').textContent.trim(), 10) || 0;
-      const pct = Math.max(0, Math.min(100, (v / max) * 100));
-      const bar = r.querySelector('.bar b');
-      bar.style.width = '0%';
-      bar.style.transition = 'width .6s ease';
-      bar.style.transformOrigin = 'left center';
-      requestAnimationFrame(()=>{ bar.style.width = pct + '%'; });
-    });
+    <!-- Card 2: Confronto per categoria negli anni -->
+    <section class="card" id="card-compare">
+      <div class="sect-hd">Confronto avicoli negli anni</div>
+      <div class="rows" id="rows"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="dot y2025"></i>2025</span>
+        <span><i class="dot y2024"></i>2024</span>
+        <span><i class="dot y2023"></i>2023</span>
+      </div>
+      <p class="note">variazione % sull'anno precedente</p>
+    </section>
+  </main>
+</section>
 
-    // Barra gialla dinamica (77 su 187) nel contenitore 2
-    const targetEl = document.querySelector('.record-wrap .target');
-    const target = parseInt(targetEl.textContent.trim(), 10) || 187; // fisso
-    const currentEl = document.querySelector('.totale-line .val');
-    const current = parseInt(currentEl.textContent.trim(), 10) || 0;
-    const barEl = document.querySelector('.record-bar b');
-    const pctRecord = Math.max(0, Math.min(100, (current / target) * 100));
-    barEl.style.width = '0%';
-    barEl.style.transition = 'width .8s ease';
-    barEl.style.transformOrigin = 'left center';
-    requestAnimationFrame(()=>{ barEl.style.width = pctRecord + '%'; });
+<!-- ====== SCRIPT BLOCCO 1 (Agenda) — racchiuso in IIFE ====== -->
+<script>
+(() => {
+  "use strict";
+  // Dati settimane
+  const WEEKS = [
+    { label: '7–13 Ottobre',  rows: [['L 7',1,0,2,1,4],['M 8',0,1,3,1,5],['M 9',2,0,1,2,5],['G 10',1,1,0,1,3],['V 11',2,2,1,2,7],['S 12',1,3,1,1,6],['D 13',0,1,2,1,4]] },
+    { label: '14–20 Ottobre', rows: [['L 14',1,0,3,2,6],['M 15',0,1,4,1,6],['M 16',2,0,1,3,6],['G 17',3,2,0,1,6],['V 18',1,2,3,2,8],['S 19',0,3,1,1,5],['D 20',2,1,2,2,7]] },
+    { label: '21–27 Ottobre', rows: [['L 21',0,2,1,1,4],['M 22',1,0,2,2,5],['M 23',2,1,3,1,7],['G 24',1,2,1,1,5],['V 25',0,3,0,2,5],['S 26',1,1,2,0,4],['D 27',2,2,2,1,7]] }
+  ];
 
-    // Confronto evolutivo 2023-2025: tre micro-barre per riga, normalizzate sul max della riga
-    const evoRows = Array.from(document.querySelectorAll('.evo-row'));
-    evoRows.forEach(r => {
-      const y23 = parseInt(r.dataset.y2023||'0',10);
-      const y24 = parseInt(r.dataset.y2024||'0',10);
-      const y25 = parseInt(r.dataset.y2025||'0',10);
-      const vmax = Math.max(y23,y24,y25,1);
+  // Cache elementi interni al blocco
+  const agenda = document.getElementById('agenda');
+  const tbody = agenda.querySelector('#tabella tbody');
+  const tfoot = agenda.querySelector('#tabella tfoot');
+  const rangeEl = agenda.querySelector('#range');
+  const summaryEl = agenda.querySelector('#summary');
+  const statsEl = agenda.querySelector('#stats');
+  const deltaEl = agenda.querySelector('#delta');
+  const prevBtn = agenda.querySelector('#prev');
+  const nextBtn = agenda.querySelector('#next');
 
-      const segs = r.querySelectorAll('.evo-bars .seg');
-      const widths = [y23,y24,y25].map(v=> Math.max(0, Math.min(100, (v / vmax) * 100)) + '%');
-      segs.forEach((seg,i)=>{
-        seg.style.transition = 'width .6s ease';
-        seg.style.width = '0%';
-        requestAnimationFrame(()=>{ seg.style.width = widths[i]; });
-      });
+  // Stato UI
+  let idx = 1; // settimana iniziale
 
-      // percentuale dal 2023 al 2025
-      const pctEl = r.querySelector('.evo-val .pct');
-      const pct = y23 === 0 ? 100 : Math.round(((y25 - y23) / y23) * 100);
-      pctEl.textContent = (pct>0?`(+${pct}%)`:`(${pct}%)`);
-      pctEl.classList.toggle('inc', pct>0);
-      pctEl.classList.toggle('dec', pct<0);
-    });
-  </script>
+  // Utilità
+  const itNum = (n, dec=1) => Number(n).toFixed(dec).replace('.', ',');
+  const getOpacity = (value) => Math.min(value/10, 1).toFixed(2);
+
+  // Rendering
+  function renderWeek(){
+    const w = WEEKS[idx];
+    rangeEl.textContent = w.label;
+
+    // Corpo tabella
+    tbody.innerHTML = '';
+    const tot = [0,0,0,0,0];
+    for (const r of w.rows){
+      const [g,o,a,c,p,t] = r;
+      tot[0]+=o; tot[1]+=a; tot[2]+=c; tot[3]+=p; tot[4]+=t;
+      tbody.insertAdjacentHTML('beforeend',
+        `<tr>
+          <td>${g}</td>
+          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(o)})">${o}</span></td>
+          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(a)})">${a}</span></td>
+          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(c)})">${c}</span></td>
+          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(p)})">${p}</span></td>
+          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(t)})">${t}</span></td>
+        </tr>`);
+    }
+
+    // Totali
+    tfoot.innerHTML =
+      `<tr>
+        <td><span class='v'>Tot</span></td>
+        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[0])})">${tot[0]}</span></td>
+        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[1])})">${tot[1]}</span></td>
+        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[2])})">${tot[2]}</span></td>
+        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[3])})">${tot[3]}</span></td>
+        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[4])})"><b>${tot[4]}</b></span></td>
+      </tr>`;
+
+    // Riepilogo 1
+    summaryEl.innerHTML =
+      `<span class="line" style="animation-delay:0ms">
+        Questa settimana al Tatone servono ${tot[0]} oche, ${tot[1]} anatre, ${tot[2]} capponi, ${tot[3]} polli, per un totale di ${tot[4]} avicoli prenotati.
+      </span>`;
+
+    // Riepilogo 2
+    const totalsPerDay = w.rows.map(r=>r[5]);
+    const maxVal = Math.max(...totalsPerDay);
+    const dayNames = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
+    const maxIdxs = totalsPerDay.map((v,i)=>v===maxVal?i:null).filter(i=>i!==null);
+    const daysStr = maxIdxs.map(i=>dayNames[i]).join(', ');
+    const busiest = maxIdxs.length>1
+      ? `i giorni più carichi sono ${daysStr} con ${maxVal} capi.`
+      : `il giorno più carico è ${daysStr} con ${maxVal} capi.`;
+    const avg = itNum(tot[4]/7,1);
+    const prepHours = Math.round((tot[4]*20)/60); // intero, tempo settimanale
+
+    statsEl.innerHTML =
+      `<span class="line" style="animation-delay:400ms">
+        La media giornaliera è di ${avg} capi, ${busiest} Tempo totale settimanale di preparazione: ${prepHours} ore (calcola 20 minuti ad avicolo).
+      </span>`;
+
+    // Riepilogo 3 (variazione %)
+    let deltaTxt = 'Variazione rispetto alla settimana precedente: n.d.';
+    if(idx>0){
+      const prevTot = [0,0,0,0,0];
+      for (const r of WEEKS[idx-1].rows){ prevTot[0]+=r[1]; prevTot[1]+=r[2]; prevTot[2]+=r[3]; prevTot[3]+=r[4]; prevTot[4]+=r[5]; }
+      const base = prevTot[4];
+      if(base>0){
+        const perc = Math.round(((tot[4]-base)/base)*100);
+        deltaTxt = `Variazione rispetto alla settimana precedente: ${perc>0?`+${perc}%`:`${perc}%`}`;
+      }
+    }
+    deltaEl.innerHTML = `<span class="line" style="animation-delay:800ms">${deltaTxt}</span>`;
+
+    // Stato pulsanti (visivo e aria)
+    const atStart = (idx === 0);
+    const atEnd = (idx === WEEKS.length - 1);
+    prevBtn.disabled = atStart; nextBtn.disabled = atEnd;
+    prevBtn.setAttribute('aria-disabled', String(atStart));
+    nextBtn.setAttribute('aria-disabled', String(atEnd));
+  }
+
+  // Navigazione
+  function go(delta){
+    const nextIdx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1);
+    if (nextIdx === idx) return;
+    idx = nextIdx;
+    renderWeek();
+  }
+
+  prevBtn.addEventListener('click', ()=>go(-1));
+  nextBtn.addEventListener('click', ()=>go(1));
+  window.addEventListener('keydown', e=>{
+    if(e.key==='ArrowLeft') go(-1);
+    else if(e.key==='ArrowRight') go(1);
+  });
+
+  // Init
+  renderWeek();
+})();
+</script>
+
+<!-- ====== SCRIPT BLOCCO 2 (Prenotati) — racchiuso in IIFE ====== -->
+<script>
+(() => {
+  "use strict";
+  const container = document.querySelector('[data-ocapi]');
+  const dateEl = document.getElementById('date-range');
+  try{
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('it-IT', { day:'numeric', month:'long' });
+    if (dateEl) dateEl.textContent = `Da oggi, ${formattedDate}, a fine festività.`;
+  }catch(e){/* no-op */ }
+
+  const rows = Array.from(container.querySelectorAll('.bars .row'));
+  const values = rows.map(r => parseInt(r.dataset.val, 10) || 0);
+  const max = Math.max(...values, 1);
+
+  rows.forEach((r,i) => {
+    const v = values[i];
+    const valEl = r.querySelector('.val');
+    if(valEl) valEl.textContent = String(v);
+    const b = r.querySelector('.bar b');
+    if(b){
+      let pct = (v / max) * 100;
+      if (v>0) pct = Math.max(pct, 12);
+      b.style.width = '0%';
+      b.style.transition = 'width .55s cubic-bezier(.22,.72,.24,1)';
+      requestAnimationFrame(()=>{ b.style.width = pct + '%'; });
+    }
+  });
+
+  const total = values.reduce((a,b)=>a+b,0);
+  const totalEl = container.querySelector('.ribbon .count');
+  if(totalEl) totalEl.textContent = String(total);
+})();
+</script>
+
+<!-- ====== SCRIPT BLOCCO 3 (Avanzamento 2025) — racchiuso in IIFE ====== -->
+<script>
+(() => {
+  "use strict";
+  const RECORD = 204; // record 2023 fisso
+  const data = {
+    y2023: { Oche:71, Anatre:26, Capponi:87, Polli:20 },
+    y2024: { Oche:73, Anatre:23, Capponi:71, Polli:21 },
+    y2025: { Oche:13, Anatre:23, Capponi:16, Polli:33 }
+  };
+
+  const sum = obj => Object.values(obj).reduce((a,b)=>a+(+b||0),0);
+
+  function render() {
+    // Totale 2025 + barra avanzamento
+    const totEl = document.getElementById('tot2025');
+    const progFill = document.getElementById('progFill');
+    const capRecordEl = document.getElementById('capRecord');
+    const total2025 = sum(data.y2025);
+    if (totEl) totEl.textContent = String(total2025);
+    if (capRecordEl) capRecordEl.textContent = String(RECORD);
+    const pctTot = Math.max(0, Math.min(100, (total2025 / RECORD) * 100));
+    if (progFill){
+      progFill.style.width = '0%';
+      void progFill.offsetWidth; // reflow per animazione affidabile
+      progFill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
+      progFill.style.width = pctTot + '%';
+    }
+
+    // Confronto per categoria
+    const rowsWrap = document.getElementById('rows');
+    if (!rowsWrap) return;
+    rowsWrap.innerHTML = '';
+    const cats = Object.keys(data.y2025);
+    const maxByCat = {};
+    for (const cat of cats){
+      maxByCat[cat] = Math.max(data.y2023[cat]||0, data.y2024[cat]||0, data.y2025[cat]||0, 1);
+    }
+
+    const mkRow = (cat) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'row';
+      const title = document.createElement('div');
+      title.className = 'name';
+      title.textContent = cat.toUpperCase();
+      wrap.appendChild(title);
+
+      const bars = document.createElement('div');
+      bars.className = 'bars';
+      wrap.appendChild(bars);
+
+      const years = [
+        { color:'y2025', val:data.y2025[cat]||0 },
+        { color:'y2024', val:data.y2024[cat]||0 },
+        { color:'y2023', val:data.y2023[cat]||0 }
+      ];
+
+      for (const y of years){
+        const line = document.createElement('div');
+        line.className = 'barline';
+        const bar = document.createElement('div');
+        bar.className = 'bar ' + y.color;
+        const fill = document.createElement('b');
+        fill.style.width = '0%';
+        fill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
+        bar.appendChild(fill);
+
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = y.val;
+
+        line.appendChild(bar);
+        line.appendChild(tag);
+        bars.appendChild(line);
+
+        let pct = Math.max(0, Math.min(100, (y.val / maxByCat[cat]) * 100));
+        if (y.val > 0) pct = Math.max(pct, 7); // larghezza minima
+        requestAnimationFrame(()=>{ fill.style.width = pct + '%'; });
+      }
+
+      // Delta 2025 vs 2024 (accanto al titolo categoria)
+      const v25 = data.y2025[cat]||0, v24 = data.y2024[cat]||0;
+      const delta = v24===0 ? 0 : Math.round(((v25 - v24) / v24) * 100);
+      const d = document.createElement('span');
+      d.className = 'delta ' + (delta>=0 ? 'up':'down');
+      d.textContent = (delta>=0?'+':'') + delta + '%';
+      title.appendChild(d);
+
+      return wrap;
+    };
+
+    for (const cat of cats){ rowsWrap.appendChild(mkRow(cat)); }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render, { once:true });
+  } else {
+    render();
+  }
+})();
+</script>
+
 </body>
 </html>
