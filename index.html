@@ -73,34 +73,44 @@
     background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);
     max-width:460px;width:100%;padding:20px 16px;display:grid;gap:16px
   }
+  /* Titolo allineato agli altri blocchi (18px) */
   [data-ocapi] .panel-header{text-align:center;display:grid;gap:8px;margin-bottom:8px}
-  [data-ocapi] .panel-header h1{font-size:22px;font-weight:900;color:var(--accent);line-height:1.3;letter-spacing:.25px;margin:0}
+  [data-ocapi] .panel-header h1{font-size:18px;font-weight:900;color:var(--accent);line-height:1.3;letter-spacing:.25px;margin:0}
   [data-ocapi] .panel-header h2{font-size:15px;font-weight:700;color:var(--fg);opacity:.9;letter-spacing:.2px;margin:0}
 
-  [data-ocapi] .bars{display:grid;gap:14px}
+  /* Barre leggermente meno spesse e migliore respiro mobile */
+  [data-ocapi] .bars{display:grid;gap:12px; margin-bottom:8px;}
   [data-ocapi] .row{display:grid;grid-template-columns:110px 1fr 76px;align-items:center;gap:10px}
   [data-ocapi] .lbl{font-weight:800;font-size:16px;color:#e6e8ea;text-transform:uppercase;opacity:.95}
 
-  [data-ocapi] .bar{height:22px;border-radius:12px;background:#0f1114;border:1px solid #0b0d11;overflow:hidden}
+  [data-ocapi] .bar{height:18px;border-radius:12px;background:#0f1114;border:1px solid #0b0d11;overflow:hidden}
   [data-ocapi] .bar b{display:block;height:100%;width:0;border-radius:inherit}
   [data-ocapi] .oche b{background:var(--oc)}
   [data-ocapi] .anatre b{background:var(--an)}
   [data-ocapi] .capponi b{background:var(--cap)}
   [data-ocapi] .polli b{background:var(--ok)}
-  [data-ocapi] .val{font-size:22px;font-weight:900;text-align:right;color:#ffffff;font-variant-numeric:tabular-nums}
 
-  [data-ocapi] .ribbon{background:var(--panel-2);border:1px solid var(--hair);border-radius:12px;padding:10px 12px;display:flex;justify-content:center;align-items:center;gap:8px;text-align:center}
+  /* Numeri leggermente ridotti per uniformità */
+  [data-ocapi] .val{font-size:20px;font-weight:900;text-align:right;color:#ffffff;font-variant-numeric:tabular-nums}
+
+  /* Riquadro “Ancora da macellare” leggermente staccato e numero un filo più piccolo */
+  [data-ocapi] .ribbon{
+    background:var(--panel-2);border:1px solid var(--hair);border-radius:12px;
+    padding:10px 12px;display:flex;justify-content:center;align-items:center;gap:8px;text-align:center;
+    margin-top:6px; /* separazione visiva dalla barra sovrastante */
+  }
   [data-ocapi] .ribbon .label{font-size:14px;font-weight:800;letter-spacing:.3px;color:#c2c5c9;text-transform:uppercase}
-  [data-ocapi] .ribbon .count{font-size:24px;font-weight:900;color:var(--accent);line-height:1}
+  [data-ocapi] .ribbon .count{font-size:22px;font-weight:900;color:var(--accent);line-height:1}
 
+  /* Mobile tuning */
   @media (max-width:430px){
     [data-ocapi] .panel{padding:16px 12px}
-    [data-ocapi] .panel-header h1{font-size:20px}
+    [data-ocapi] .panel-header h1{font-size:18px} /* resta coerente */
     [data-ocapi] .panel-header h2{font-size:14px}
-    [data-ocapi] .row{grid-template-columns:98px 1fr 64px}
-    [data-ocapi] .bar{height:20px}
-    [data-ocapi] .val{font-size:20px}
-    [data-ocapi] .ribbon .count{font-size:22px}
+    [data-ocapi] .row{grid-template-columns:98px 1fr 64px; gap:8px}
+    [data-ocapi] .bar{height:16px}
+    [data-ocapi] .val{font-size:18px}
+    [data-ocapi] .ribbon .count{font-size:20px}
     [data-ocapi] .lbl{font-size:15px}
   }
 </style>
@@ -259,18 +269,16 @@
   </main>
 </section>
 
-<!-- ====== SCRIPT BLOCCO 1 (Agenda) — racchiuso in IIFE ====== -->
+<!-- ====== SCRIPT BLOCCO 1 (Agenda) ====== -->
 <script>
 (() => {
   "use strict";
-  // Dati settimane
   const WEEKS = [
     { label: '7–13 Ottobre',  rows: [['L 7',1,0,2,1,4],['M 8',0,1,3,1,5],['M 9',2,0,1,2,5],['G 10',1,1,0,1,3],['V 11',2,2,1,2,7],['S 12',1,3,1,1,6],['D 13',0,1,2,1,4]] },
     { label: '14–20 Ottobre', rows: [['L 14',1,0,3,2,6],['M 15',0,1,4,1,6],['M 16',2,0,1,3,6],['G 17',3,2,0,1,6],['V 18',1,2,3,2,8],['S 19',0,3,1,1,5],['D 20',2,1,2,2,7]] },
     { label: '21–27 Ottobre', rows: [['L 21',0,2,1,1,4],['M 22',1,0,2,2,5],['M 23',2,1,3,1,7],['G 24',1,2,1,1,5],['V 25',0,3,0,2,5],['S 26',1,1,2,0,4],['D 27',2,2,2,1,7]] }
   ];
 
-  // Cache elementi interni al blocco
   const agenda = document.getElementById('agenda');
   const tbody = agenda.querySelector('#tabella tbody');
   const tfoot = agenda.querySelector('#tabella tfoot');
@@ -281,19 +289,15 @@
   const prevBtn = agenda.querySelector('#prev');
   const nextBtn = agenda.querySelector('#next');
 
-  // Stato UI
-  let idx = 1; // settimana iniziale
+  let idx = 1;
 
-  // Utilità
   const itNum = (n, dec=1) => Number(n).toFixed(dec).replace('.', ',');
   const getOpacity = (value) => Math.min(value/10, 1).toFixed(2);
 
-  // Rendering
   function renderWeek(){
     const w = WEEKS[idx];
     rangeEl.textContent = w.label;
 
-    // Corpo tabella
     tbody.innerHTML = '';
     const tot = [0,0,0,0,0];
     for (const r of w.rows){
@@ -310,7 +314,6 @@
         </tr>`);
     }
 
-    // Totali
     tfoot.innerHTML =
       `<tr>
         <td><span class='v'>Tot</span></td>
@@ -321,13 +324,11 @@
         <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[4])})"><b>${tot[4]}</b></span></td>
       </tr>`;
 
-    // Riepilogo 1
     summaryEl.innerHTML =
       `<span class="line" style="animation-delay:0ms">
         Questa settimana al Tatone servono ${tot[0]} oche, ${tot[1]} anatre, ${tot[2]} capponi, ${tot[3]} polli, per un totale di ${tot[4]} avicoli prenotati.
       </span>`;
 
-    // Riepilogo 2
     const totalsPerDay = w.rows.map(r=>r[5]);
     const maxVal = Math.max(...totalsPerDay);
     const dayNames = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
@@ -337,14 +338,13 @@
       ? `i giorni più carichi sono ${daysStr} con ${maxVal} capi.`
       : `il giorno più carico è ${daysStr} con ${maxVal} capi.`;
     const avg = itNum(tot[4]/7,1);
-    const prepHours = Math.round((tot[4]*20)/60); // intero, tempo settimanale
+    const prepHours = Math.round((tot[4]*20)/60);
 
     statsEl.innerHTML =
       `<span class="line" style="animation-delay:400ms">
         La media giornaliera è di ${avg} capi, ${busiest} Tempo totale settimanale di preparazione: ${prepHours} ore (calcola 20 minuti ad avicolo).
       </span>`;
 
-    // Riepilogo 3 (variazione %)
     let deltaTxt = 'Variazione rispetto alla settimana precedente: n.d.';
     if(idx>0){
       const prevTot = [0,0,0,0,0];
@@ -357,7 +357,6 @@
     }
     deltaEl.innerHTML = `<span class="line" style="animation-delay:800ms">${deltaTxt}</span>`;
 
-    // Stato pulsanti (visivo e aria)
     const atStart = (idx === 0);
     const atEnd = (idx === WEEKS.length - 1);
     prevBtn.disabled = atStart; nextBtn.disabled = atEnd;
@@ -365,12 +364,10 @@
     nextBtn.setAttribute('aria-disabled', String(atEnd));
   }
 
-  // Navigazione
   function go(delta){
     const nextIdx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1);
     if (nextIdx === idx) return;
-    idx = nextIdx;
-    renderWeek();
+    idx = nextIdx; renderWeek();
   }
 
   prevBtn.addEventListener('click', ()=>go(-1));
@@ -380,12 +377,11 @@
     else if(e.key==='ArrowRight') go(1);
   });
 
-  // Init
   renderWeek();
 })();
 </script>
 
-<!-- ====== SCRIPT BLOCCO 2 (Prenotati) — racchiuso in IIFE ====== -->
+<!-- ====== SCRIPT BLOCCO 2 (Prenotati) ====== -->
 <script>
 (() => {
   "use strict";
@@ -421,11 +417,11 @@
 })();
 </script>
 
-<!-- ====== SCRIPT BLOCCO 3 (Avanzamento 2025) — racchiuso in IIFE ====== -->
+<!-- ====== SCRIPT BLOCCO 3 (Avanzamento 2025) ====== -->
 <script>
 (() => {
   "use strict";
-  const RECORD = 204; // record 2023 fisso
+  const RECORD = 204;
   const data = {
     y2023: { Oche:71, Anatre:26, Capponi:87, Polli:20 },
     y2024: { Oche:73, Anatre:23, Capponi:71, Polli:21 },
@@ -435,7 +431,6 @@
   const sum = obj => Object.values(obj).reduce((a,b)=>a+(+b||0),0);
 
   function render() {
-    // Totale 2025 + barra avanzamento
     const totEl = document.getElementById('tot2025');
     const progFill = document.getElementById('progFill');
     const capRecordEl = document.getElementById('capRecord');
@@ -445,12 +440,11 @@
     const pctTot = Math.max(0, Math.min(100, (total2025 / RECORD) * 100));
     if (progFill){
       progFill.style.width = '0%';
-      void progFill.offsetWidth; // reflow per animazione affidabile
+      void progFill.offsetWidth;
       progFill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
       progFill.style.width = pctTot + '%';
     }
 
-    // Confronto per categoria
     const rowsWrap = document.getElementById('rows');
     if (!rowsWrap) return;
     rowsWrap.innerHTML = '';
@@ -497,11 +491,10 @@
         bars.appendChild(line);
 
         let pct = Math.max(0, Math.min(100, (y.val / maxByCat[cat]) * 100));
-        if (y.val > 0) pct = Math.max(pct, 7); // larghezza minima
+        if (y.val > 0) pct = Math.max(pct, 7);
         requestAnimationFrame(()=>{ fill.style.width = pct + '%'; });
       }
 
-      // Delta 2025 vs 2024 (accanto al titolo categoria)
       const v25 = data.y2025[cat]||0, v24 = data.y2024[cat]||0;
       const delta = v24===0 ? 0 : Math.round(((v25 - v24) / v24) * 100);
       const d = document.createElement('span');
