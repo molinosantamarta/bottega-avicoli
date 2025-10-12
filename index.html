@@ -7,17 +7,17 @@
 
 <!-- ====== STILI GLOBALI MINIMI (non interferenti) ====== -->
 <style>
-  :root{ --container-w: min(96vw, 1200px); }
-  html, body { height:100%; }
-  body{
-    margin:0; background:#0a0a0b; color:#f5f5f7;
-    font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
-  .block { padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; }
-  .block + .block { border-top:1px solid #232429; margin-top:8px; padding-top:24px; }
-  /* NASCONDI titoli Blocco 1/2/3, mantenendo markup per accessibilità */
-  .block h1.block-title{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+body::before { content: ""; display: block; height: 40px; }
+:root{ --container-w: min(96vw, 1200px); }
+html, body { height:100%; }
+body{
+  margin:0; background:#0a0a0b; color:#f5f5f7;
+  font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+.block { padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+.block + .block { border-top:1px solid #232429; margin-top:8px; padding-top:24px; }
+.block h1.block-title{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 </style>
 
 <!-- Uniform wrap per tutti i blocchi (stessa gabbia del Blocco 3) -->
@@ -51,14 +51,12 @@
   #agenda tfoot tr{background:#16181c;text-align:center}
   #agenda tfoot td{border-top:1px solid var(--border);border-bottom:none;color:var(--text);text-align:center}
 
-  /* Numeri con forte ombra per massima leggibilità su giallo pieno */
   #agenda td>.v, #agenda tfoot td>.v{
     display:inline-block;min-width:1.6em;padding:2px 5px;border:1px solid var(--border);border-radius:6px;line-height:1.1;font-weight:800;font-size:12px;text-align:center;color:var(--text);background-color:rgba(255,214,10,0.12);
     text-shadow: 0 0 1px #000, 0 1px 0 #000, 0 0 2px rgba(0,0,0,.95);
   }
 
-  /* SUMMARY stile ChatGPT: più bold + shimmer morbido (fallback per reduced motion) */
-  #agenda .summary{max-width:var(--container-w);width:100%;color:var(--muted);font-size:15px;text-align:center;line-height:1.6;margin-top:8px;font-weight:700}
+  #agenda .summary{max-width:var(--container-w);width:100%;color:#9ea1a5;font-size:15px;text-align:center;line-height:1.6;margin-top:8px;font-weight:700}
   #agenda .summary .line{opacity:0;transform:translateY(6px);filter:blur(2px);display:inline-block;
     animation:fadeUpAgenda .6s forwards cubic-bezier(.22,.72,.24,1), shimmer 2.6s ease-in-out infinite .4s;
     background:linear-gradient(90deg, rgba(255,255,255,.25) 0%, rgba(255,255,255,.85) 50%, rgba(255,255,255,.25) 100%);
@@ -66,14 +64,11 @@
   @keyframes fadeUpAgenda{to{opacity:1;transform:translateY(0);filter:blur(0)}}
   @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
   @media (prefers-reduced-motion: reduce){
-    #agenda .summary .line{animation:fadeUpAgenda .6s forwards; background:none; -webkit-text-fill-color:unset; color:var(--muted)}
+    #agenda .summary .line{animation:fadeUpAgenda .6s forwards; background:none; -webkit-text-fill-color:unset; color:#9ea1a5}
   }
 
-  /* Disattiva glow dopo il primo avvio */
-  .no-glow #agenda .summary .line{animation:fadeUpAgenda .6s forwards; background:none; -webkit-text-fill-color:unset; color:var(--muted)}
-
+  .no-glow #agenda .summary .line{animation:fadeUpAgenda .6s forwards; background:none; -webkit-text-fill-color:unset; color:#9ea1a5}
   #agenda #delta .line { display:inline-block; width:100%; text-align:center; }
-
   #avanz .hd { display:flex; flex-direction:column; align-items:center; justify-content:center; }
   #avanz .hd h1.ico { display:flex; align-items:center; justify-content:center; }
 
@@ -91,35 +86,22 @@
 <style>
   [data-ocapi]{
     --bg:#0a0a0b; --panel:#14161a; --panel-2:#1a1d22; --fg:#f3f4f5; --muted:#a7abb1; --hair:#262a30; --accent:#f2cf57;
-    --oc:#5a8fe3; --an:#d85b5b; --cap:#dcb24a; --ok:#4eb872; --radius:14px; --shadow:0 12px 36px rgba(0,0,0,.38);
+    --radius:14px; --shadow:0 12px 36px rgba(0,0,0,.38);
   }
-  /* Wrap come in #avanz per adattamento dinamico */
   #prenotati .wrap{width:100%;max-width:var(--container-w);display:grid;gap:14px}
-
-  /* Card esterna IDENTICA alle card di #avanz */
   [data-ocapi] .card-like{
     background:var(--panel); border:1px solid var(--hair); border-radius:var(--radius);
     box-shadow:var(--shadow); padding:16px 14px; width:100%; max-width:100%; margin:0; display:grid; gap:12px; box-sizing:border-box;
   }
   [data-ocapi] .panel{ background:transparent; border:0; border-radius:var(--radius); max-width:100%; width:100%; padding:0; display:grid; gap:16px }
-
-  /* Ribbon come testata/contatore */
   [data-ocapi] .ribbon{ background:var(--panel-2); border:1px solid var(--hair); border-radius:12px; padding:12px 14px; display:flex; justify-content:center; align-items:center; gap:10px; text-align:center; }
   [data-ocapi] .ribbon .label{font-size:14px;font-weight:800;letter-spacing:.3px;color:#c2c5c9;text-transform:uppercase; display:inline-flex; align-items:center; gap:8px}
   [data-ocapi] .ribbon .count{font-size:22px;font-weight:900;color:var(--accent);line-height:1}
-
-  /* Barre categorie (tutte gialle) */
   [data-ocapi] .bars{display:grid;gap:12px; margin-bottom:4px;}
   [data-ocapi] .row{display:grid;grid-template-columns:110px 1fr 76px;align-items:center;gap:10px}
   [data-ocapi] .lbl{font-weight:800;font-size:16px;color:#e6e8ea;text-transform:uppercase;opacity:.95}
   [data-ocapi] .bar{height:18px;border-radius:12px;background:#0f1114;border:1px solid #0b0d11;overflow:hidden}
   [data-ocapi] .bar b{display:block;height:100%;width:0;border-radius:inherit;background:var(--accent)!important}
-  /* classi colore legacy lasciate ma sovrascritte dall'!important */
-  [data-ocapi] .oche b{background:var(--accent)!important}
-  [data-ocapi] .anatre b{background:var(--accent)!important}
-  [data-ocapi] .capponi b{background:var(--accent)!important}
-  [data-ocapi] .polli b{background:var(--accent)!important}
-
   [data-ocapi] .val{font-size:20px;font-weight:900;text-align:right;color:#ffffff;font-variant-numeric:tabular-nums}
 
   @media (max-width:430px){
@@ -130,6 +112,16 @@
     [data-ocapi] .val{font-size:18px}
     [data-ocapi] .ribbon .count{font-size:20px}
     [data-ocapi] .lbl{font-size:15px}
+  }
+
+  /* Mobile tweaks del blocco 2 */
+  @media (max-width:430px){
+    #prenotati.block { align-items: stretch; }
+    #prenotati .wrap { width: 100%; max-width: var(--container-w); }
+    #prenotati [data-ocapi] .card-like,
+    #prenotati [data-ocapi] .panel,
+    #prenotati [data-ocapi] .bars { width: 100%; max-width: none; }
+    #prenotati [data-ocapi] .row { grid-template-columns: minmax(98px, 140px) 1fr minmax(64px, 100px); }
   }
 </style>
 
@@ -144,7 +136,6 @@
   #avanz .hd{display:grid;gap:4px;text-align:center}
   #avanz .hd h1{font-size:18px;font-weight:900;letter-spacing:.25px;color:var(--hl);margin:0}
   #avanz .hd p{font-size:12.5px;color:var(--muted);margin:0}
-
   #avanz .totale{display:grid;gap:10px}
   #avanz .tot-row{display:flex;justify-content:space-between;align-items:baseline}
   #avanz .tot-row .lbl{font-size:13px;color:#cfd3d8;font-weight:800;letter-spacing:.2px;text-transform:uppercase}
@@ -153,13 +144,11 @@
   #avanz .prog{position:relative;height:18px;background:#0f1114;border:1px solid #0b0d11;border-radius:999px;overflow:hidden;flex:1}
   #avanz .prog b{display:block;height:100%;width:0;background:var(--y2025);border-radius:inherit}
   #avanz .cap{font-size:12px;color:#d8dbe0;font-weight:800}
-
   #avanz .sect-hd{font-size:13px;font-weight:800;letter-spacing:.22px;text-transform:uppercase;color:#cfd3d8;margin-top:2px;text-align:center}
   #avanz .rows{display:grid;gap:12px}
   #avanz .row{display:grid;gap:6px}
   #avanz .row .name{font-size:14px;font-weight:800;letter-spacing:.2px;color:#e9ecef}
   #avanz .bars{display:grid;gap:6px}
-
   #avanz .barline{display:flex;align-items:center;gap:8px}
   #avanz .bar{height:14px;border-radius:999px;overflow:hidden;position:relative;background:#0f1114;border:1px solid #0b0d11;flex:1}
   #avanz .bar b{display:block;height:100%;width:0}
@@ -167,52 +156,22 @@
   #avanz .y2024 b{background:var(--y2024)}
   #avanz .y2023 b{background:var(--y2023)}
   #avanz .barline .tag{font-size:13px;font-weight:800;color:#cfd3d8;opacity:.9;min-width:28px;text-align:right}
-
   #avanz .delta{font-size:12px;font-weight:800;margin-left:6px}
   #avanz .up{color:#5ee07f} #avanz .down{color:#ff8c8c}
-
   #avanz .legend{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:6px;font-size:13px;color:#cfd3d8;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;width:100%}
   #avanz .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
   #avanz .legend .dot.y2025{background:var(--y2025)}
   #avanz .legend .dot.y2024{background:var(--y2024)}
   #avanz .legend .dot.y2023{background:var(--y2023)}
   #avanz .note{ text-align:center; font-size:11px; color:#a7abb1; margin-top:4px; }
-
-  @media (max-width:430px){
-    #avanz .hd h1{font-size:17px}
-    #avanz .tot-row .val{font-size:24px}
-    #avanz .prog{height:16px}
-    #avanz .row .name{font-size:13.5px}
-    #avanz .bar{height:13px}
-
-/* 1) Allarga davvero la gabbia del Blocco 2: niente centratura, ma stretch */
-#prenotati.block { align-items: stretch; }            /* override della .block */
-
-/* 2) Assicurati che la gabbia riempia la riga come nel Blocco 3 */
-#prenotati .wrap { width: 100%; max-width: var(--container-w); }
-
-/* 3) Evita che contenitori interni reintroducano limiti */
-#prenotati [data-ocapi] .card-like,
-#prenotati [data-ocapi] .panel,
-#prenotati [data-ocapi] .bars { width: 100%; max-width: none; }
-
-/* 4) Barre davvero “fluide”: la colonna centrale prende tutto lo spazio */
-#prenotati [data-ocapi] .row {
-  grid-template-columns: minmax(98px, 140px) 1fr minmax(64px, 100px);
-}
-    
-  }
 </style>
 
 <!-- ====== Icone minimal (gialle) ====== -->
 <style>
   .ico{display:inline-flex;align-items:center;gap:8px;color:#f2cf57}
   .ico::before{content:"";display:inline-block;width:1.05em;height:1.05em;background:currentColor;mask-size:contain;mask-repeat:no-repeat;mask-position:center;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;margin-right:6px}
-  /* Calendar icon */
   .ico-cal::before{mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6 2h2v4H6zM16 2h2v4h-2z'/><rect x='3' y='4' width='18' height='17' rx='3'/><rect x='3' y='8' width='18' height='13'/></svg>");-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6 2h2v4H6zM16 2h2v4h-2z'/><rect x='3' y='4' width='18' height='17' rx='3'/><rect x='3' y='8' width='18' height='13'/></svg>")}
-  /* Award icon */
-  .ico-trophy::before{mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 4h14v2a4 4 0 0 1-4 4h-1a5 5 0 0 1-4 0H9A4 4 0 0 1 5 6V4z'/><path d='M8 20h8l-2-4h-4l-2 4z'/><rect x='10' y='10' width='4' height='3'/></svg>");-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 4h14v2a4 4 0 0 1-4 4h-1a5 5 0 0 1-4 0H9A4 4 0 0 1 5 6V4z'/><path d='M8 20h8l-2-4h-4l-2 4z'/><rect x='10' y='10' width='4' height='3'/></svg>")}
-  /* Dot blink for ribbon */
+  .ico-trophy::before{mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 4h14v2a4 4 0 0 1-4 4h-1a5 5 0 0 1-4 0H9A4 4 0 0 1 5 6V4z'/><path d='M8 20h8l-2-4h-4l-2 4z'/></svg>");-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 4h14v2a4 4 0 0 1-4 4h-1a5 5 0 0 1-4 0H9A4 4 0 0 1 5 6V4z'/><path d='M8 20h8l-2-4h-4l-2 4z'/></svg>")}
   .dot-blink{width:9px;height:9px;border-radius:50%;background:#f2cf57;display:inline-block;margin-right:8px;box-shadow:0 0 10px rgba(242,207,87,.9);animation:dotBlink .9s infinite alternate}
   @keyframes dotBlink{from{opacity:.45;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 </style>
@@ -261,17 +220,17 @@
           </div>
 
           <div class="bars" role="list">
-            <div class="row oche" role="listitem" data-val="13">
-              <div class="lbl">OCHE</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">13</div>
+            <div class="row oche" role="listitem" data-val="0">
+              <div class="lbl">OCHE</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">0</div>
             </div>
-            <div class="row anatre" role="listitem" data-val="23">
-              <div class="lbl">ANATRE</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">23</div>
+            <div class="row anatre" role="listitem" data-val="0">
+              <div class="lbl">ANATRE</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">0</div>
             </div>
-            <div class="row capponi" role="listitem" data-val="16">
-              <div class="lbl">CAPPONI</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">16</div>
+            <div class="row capponi" role="listitem" data-val="0">
+              <div class="lbl">CAPPONI</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">0</div>
             </div>
-            <div class="row polli" role="listitem" data-val="33">
-              <div class="lbl">POLLI</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">33</div>
+            <div class="row polli" role="listitem" data-val="0">
+              <div class="lbl">POLLI</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">0</div>
             </div>
           </div>
         </section>
@@ -304,18 +263,18 @@
         <span><i class="dot y2024"></i>2024</span>
         <span><i class="dot y2023"></i>2023</span>
       </div>
-      <p class="note">variazione % sull'anno precedente</p>
+      <p class="note">variazione % sull'anno precedente · 2025 da CSV · 2023–2024 fissi</p>
     </section>
   </main>
 </section>
 
+<!-- ====== SCRIPT UNIFICATO (CSV + RENDER) ====== -->
 <script type="module">
 /* ========================
    CONFIG & UTILITIES
 ======================== */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS6a2Ij-RW70-i-hk_Qw_0gChVKzsVljdvMjSNwqpF4CXyeHfDurxRBIcGa8AEd0HR-tNW6y_LZSn5t/pub?gid=2121991604&single=true&output=csv";
 
-// Dizionario sinonimi per intestazioni (case/accents insensitive)
 const COLMAP = {
   data: ["data","date","giorno","day"],
   oche: ["oche","oca","geese","goose"],
@@ -328,11 +287,9 @@ const IT_MONTHS = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Lugl
 const IT_DAYS_SHORT = ["L","M","M","G","V","S","D"]; // Lunedì..Domenica
 const IT_DAYS_LONG = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
 
-// Normalizza stringhe per match robusto
 const norm = s => s?.toString().trim().toLowerCase()
   .normalize("NFD").replace(/\p{Diacritic}/gu,"");
 
-// CSV parser piccolo ma robusto (virgolette/virgole)
 function parseCSV(text){
   const rows=[]; let cur="", row=[], inQ=false;
   for (let i=0;i<text.length;i++){
@@ -349,7 +306,6 @@ function parseCSV(text){
   return rows;
 }
 
-// Trova indice colonna per chiave logica (es. "oche")
 function resolveColIdx(headers, key){
   const wanted = COLMAP[key];
   if (!wanted) return -1;
@@ -360,43 +316,52 @@ function resolveColIdx(headers, key){
   return -1;
 }
 
-// Converte stringa -> numero intero sicuro
-const toInt = v => {
+// Parsing numeri in formato italiano (virgola decimale)
+function toNumberIT(v){
   if (v == null) return 0;
-  const n = parseInt(String(v).replace(/[^\d\-]/g,""),10);
+  const s = String(v).trim().replace(/\s+/g, '');
+  if (!s) return 0;
+  const normalized = s.replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(normalized);
   return Number.isFinite(n) ? n : 0;
-};
-
-// Parse data italiana o ISO (tollerante)
-function parseDate(v){
-  const s = String(v).trim();
-  // Prova ISO diretta
-  let d = new Date(s);
-  if (!isNaN(d)) return d;
-  // Prova formati tipici gg/mm/aaaa o gg-mm-aaaa
-  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-  if (m){
-    const [_, dd, mm, yyyy] = m;
-    const Y = parseInt(yyyy.length===2 ? "20"+yyyy : yyyy,10);
-    const D = new Date(Y, parseInt(mm,10)-1, parseInt(dd,10));
-    if (!isNaN(D)) return D;
-  }
-  return null;
 }
 
-// Trova lunedì della settimana della data
+function parseDate(v){
+  if (v == null) return null;
+  let s = String(v).trim();
+  if (!s) return null;
+
+  // Tieni solo la parte di data se c'è anche orario
+  s = s.split('T')[0].split(' ')[0];
+
+  // ISO (YYYY-MM-DD)
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso){
+    const Y = parseInt(iso[1],10), M = parseInt(iso[2],10)-1, D = parseInt(iso[3],10);
+    const d = new Date(Y, M, D);
+    return isNaN(d) ? null : d;
+  }
+
+  // Locale (DD/MM/YYYY o DD-MM-YYYY)
+  const loc = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (loc){
+    const dd = parseInt(loc[1],10), mm = parseInt(loc[2],10), yyyy = parseInt(loc[3].length===2?('20'+loc[3]):loc[3],10);
+    const d = new Date(yyyy, mm-1, dd);
+    return isNaN(d) ? null : d;
+  }
+
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
 function mondayOf(d){
   const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const dow = (dt.getDay()+6)%7; // 0 = Lunedì
+  const dow = (dt.getDay()+6)%7;
   dt.setDate(dt.getDate() - dow);
   dt.setHours(0,0,0,0);
   return dt;
 }
-function addDays(d,n){
-  const x = new Date(d); x.setDate(x.getDate()+n); return x;
-}
-
-// Range label tipo "7–13 Ottobre"
+function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
 function formatWeekLabel(mon){
   const sun = addDays(mon,6);
   const d1 = mon.getDate();
@@ -405,9 +370,6 @@ function formatWeekLabel(mon){
   return `${d1}\u2013${d7} ${month}`;
 }
 
-/* ========================
-   LOAD DATA FROM CSV
-======================== */
 async function loadData(){
   const res = await fetch(CSV_URL, { cache: "no-store" });
   if (!res.ok) throw new Error("CSV non raggiungibile");
@@ -417,54 +379,74 @@ async function loadData(){
   const headers = rows[0];
   const body = rows.slice(1);
 
-  const idx = {
-    data:   resolveColIdx(headers,"data"),
-    oche:   resolveColIdx(headers,"oche"),
-    anatre: resolveColIdx(headers,"anatre"),
-    cap:    resolveColIdx(headers,"capponi"),
-    polli:  resolveColIdx(headers,"polli"),
+  let idx = {
+    data:   resolveColIdx(headers, "data"),
+    oche:   resolveColIdx(headers, "oche"),
+    anatre: resolveColIdx(headers, "anatre"),
+    cap:    resolveColIdx(headers, "capponi"),
+    polli:  resolveColIdx(headers, "polli"),
+  };
+  // Fallback robusti sugli indici se le intestazioni mancano/sono non standard
+  if (idx.data   < 0) idx.data   = 0;  // prima colonna = data
+  if (idx.oche   < 0) idx.oche   = 1;  // B
+  if (idx.anatre < 0) idx.anatre = 2;  // C
+  if (idx.cap    < 0) idx.cap    = 3;  // D
+  if (idx.polli  < 0) idx.polli  = 4;  // E
+
+  let recs = [];
+  if (idx.data >= 0){
+    recs = body.map(r => {
+      const d = parseDate(r[idx.data]);
+      if (!d) return null;
+      return {
+        date: d,
+        y: d.getFullYear(),
+        o: toNumberIT(r[idx.oche]),
+        a: toNumberIT(r[idx.anatre]),
+        c: toNumberIT(r[idx.cap]),
+        p: toNumberIT(r[idx.polli]),
+      };
+    }).filter(Boolean);
+  }
+
+  // Totale globale e totali per categoria (arrotondati SOLO quando mostrati)
+  let totalAllFloat = 0;
+  const totalsByCatFloat = { Oche:0, Anatre:0, Capponi:0, Polli:0 };
+  for (const r of body){
+    const o = toNumberIT(r[idx.oche]);
+    const a = toNumberIT(r[idx.anatre]);
+    const c = toNumberIT(r[idx.cap]);
+    const p = toNumberIT(r[idx.polli]);
+    totalAllFloat += o + a + c + p;
+    totalsByCatFloat.Oche   += o;
+    totalsByCatFloat.Anatre += a;
+    totalsByCatFloat.Capponi+= c;
+    totalsByCatFloat.Polli  += p;
+  }
+  const totalAll = Math.round(totalAllFloat);
+  const totalsByCat = {
+    Oche:    Math.round(totalsByCatFloat.Oche),
+    Anatre:  Math.round(totalsByCatFloat.Anatre),
+    Capponi: Math.round(totalsByCatFloat.Capponi),
+    Polli:   Math.round(totalsByCatFloat.Polli),
   };
 
-  // Se mancano colonne essenziali, fallback sicuro
-  if (idx.data < 0) throw new Error("Colonna 'data' non trovata nel CSV");
-  // Le altre, se assenti, vengono considerate 0.
-
-  // Record normalizzati
-  const recs = body.map(r => {
-    const d = parseDate(r[idx.data]);
-    if (!d) return null;
-    return {
-      date: d,
-      y: d.getFullYear(),
-      o: toInt(r[idx.oche]),
-      a: toInt(r[idx.anatre]),
-      c: toInt(r[idx.cap]),
-      p: toInt(r[idx.polli]),
-    };
-  }).filter(Boolean);
-
-  return recs;
+  return { recs, totalAll, totalsByCat };
 }
 
-/* ========================
-   BUILD DATASETS FOR UI
-======================== */
 function buildWeeks(recs){
-  // Gruppo per settimana (Lunedì->Domenica), sommo per giorno
-  const byWeek = new Map(); // key = monday ISO string
+  const byWeek = new Map();
   for (const r of recs){
     const mon = mondayOf(r.date);
     const key = mon.toISOString().slice(0,10);
     if (!byWeek.has(key)) byWeek.set(key, { mon, days: Array(7).fill(null).map(()=>({o:0,a:0,c:0,p:0})) });
     const pack = byWeek.get(key);
-    const dow = (r.date.getDay()+6)%7; // 0..6 (L..D)
+    const dow = (r.date.getDay()+6)%7;
     pack.days[dow].o += r.o;
     pack.days[dow].a += r.a;
     pack.days[dow].c += r.c;
     pack.days[dow].p += r.p;
   }
-
-  // Ordino per settimana e trasformo nel formato consumato dall’Agenda
   const weeks = Array.from(byWeek.values()).sort((A,B)=>A.mon-B.mon).map(w=>{
     const label = formatWeekLabel(w.mon);
     const rows = w.days.map((d, i) => {
@@ -474,49 +456,25 @@ function buildWeeks(recs){
     });
     return { label, rows };
   });
-
-  // Se non ci sono settimane nel CSV, restituisco array vuoto (il renderer userà fallback)
   return weeks;
 }
 
 function buildRemaining(recs, today=new Date()){
-  // "Ancora da macellare": sommo solo date >= oggi
-  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // h00
-  let O=0,A=0,C=0,P=0;
+  // Confronto per GIORNO (locale): includi TUTTO l’oggi e i giorni futuri
+  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let O=0, A=0, C=0, P=0; // somme in floating point
   for (const r of recs){
-    if (r.date >= t0){ O+=r.o; A+=r.a; C+=r.c; P+=r.p; }
+    const rd = new Date(r.date.getFullYear(), r.date.getMonth(), r.date.getDate());
+    if (rd >= t0){
+      O += r.o; A += r.a; C += r.c; P += r.p;
+    }
   }
-  return { o:O, a:A, c:C, p:P, total: O+A+C+P };
+  // Nessun arrotondamento qui: lo faremo in renderPrenotati con Math.ceil
+  return { o:O, a:A, c:C, p:P, total: O + A + C + P };
 }
 
-function buildYearCompare(recs){
-  const years = new Map(); // y -> {Oche,Anatre,Capponi,Polli}
-  for (const r of recs){
-    if (!years.has(r.y)) years.set(r.y, { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 });
-    const y = years.get(r.y);
-    y.Oche   += r.o;
-    y.Anatre += r.a;
-    y.Capponi+= r.c;
-    y.Polli  += r.p;
-    y.tot    += r.o + r.a + r.c + r.p;
-  }
-
-  // Prendo 2023, 2024, 2025 se esistono (mantenendo l’ordine UI)
-  const y2023 = years.get(2023) || { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 };
-  const y2024 = years.get(2024) || { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 };
-  const y2025 = years.get(2025) || { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 };
-
-  // Record storico (mantengo 204 se vuoi fisso) oppure calcolo max storico
-  const record = Math.max(204, y2023.tot, y2024.tot); // così non “rompo” la tua nota UI
-
-  return { y2023, y2024, y2025, record };
-}
-
-/* ========================
-   RENDERERS (stessa UI)
-======================== */
 function renderAgenda(weeks){
-  // Fallback ai dati demo se weeks è vuoto
   const DEMO = [
     { label: '7–13 Ottobre',  rows: [['L 7',1,0,2,1,4],['M 8',0,1,3,1,5],['M 9',2,0,1,2,5],['G 10',1,1,0,1,3],['V 11',2,2,1,2,7],['S 12',1,3,1,1,6],['D 13',0,1,2,1,4]] },
     { label: '14–20 Ottobre', rows: [['L 14',1,0,3,2,6],['M 15',0,1,4,1,6],['M 16',2,0,1,3,6],['G 17',3,2,0,1,6],['V 18',1,2,3,2,8],['S 19',0,3,1,1,5],['D 20',2,1,2,2,7]] },
@@ -524,10 +482,8 @@ function renderAgenda(weeks){
   ];
   const WEEKS = weeks && weeks.length ? weeks : DEMO;
 
-  // Battute venete (mantengo il tuo sistema + fallback locale)
   const JOKES_URL = './veneto-jokes.json';
-  const venetoJokesFallback = ["Xe bon, ghe semo!"];
-  let venetoJokes = [...venetoJokesFallback];
+  let venetoJokes = ["Xe bon, ghe semo!"];
   fetch(JOKES_URL, { cache:'no-store' }).then(r=>r.ok?r.json():[]).then(arr=>{
     if (Array.isArray(arr) && arr.length) venetoJokes = arr.filter(s=>typeof s==='string' && s.trim());
   }).catch(()=>{});
@@ -539,10 +495,7 @@ function renderAgenda(weeks){
   const summaryEl = agenda.querySelector('#summary');
   const statsEl = agenda.querySelector('#stats');
   const deltaEl = agenda.querySelector('#delta');
-  const prevBtn = agenda.querySelector('#prev');
-  const nextBtn = agenda.querySelector('#next');
 
-  // glow una sola volta (rispetto tua logica)
   const firstRunKey = "agendaGlowDone";
   if (localStorage.getItem(firstRunKey)) {
     document.body.classList.add("no-glow");
@@ -550,8 +503,7 @@ function renderAgenda(weeks){
     localStorage.setItem(firstRunKey, "1");
   }
 
-  let idx = Math.min(1, WEEKS.length-1); // apri sulla settimana centrale se possibile
-
+  let idx = Math.min(1, WEEKS.length-1);
   const itNum = (n, dec=1) => Number(n).toFixed(dec).replace('.', ',');
   const getOpacity = (value) => Math.min(value/10, 1).toFixed(2);
 
@@ -585,10 +537,26 @@ function renderAgenda(weeks){
         <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[4])})"><b>${tot[4]}</b></span></td>
       </tr>`;
 
-    summaryEl.innerHTML =
-      `<span class="line" style="animation-delay:0ms">
-        Questa settimana al Tatone servono ${tot[0]} oche, ${tot[1]} anatre, ${tot[2]} capponi, ${tot[3]} polli, per un totale di ${tot[4]} avicoli prenotati.
-      </span>`;
+    // Frase “smart”: mostra solo le categorie > 0, con singolare/plurale + battuta veneta
+    summaryEl.innerHTML = (() => {
+      const parts = [];
+      const fmt = (n, one, many) => (n === 1 ? one : `${n} ${many}`);
+      if (tot[0] > 0) parts.push(fmt(tot[0], '1 oca', 'oche'));
+      if (tot[1] > 0) parts.push(fmt(tot[1], '1 anatra', 'anatre'));
+      if (tot[2] > 0) parts.push(fmt(tot[2], '1 cappone', 'capponi'));
+      if (tot[3] > 0) parts.push(fmt(tot[3], '1 pollo', 'polli'));
+      const list = parts.join(', ');
+      const joke = (Array.isArray(venetoJokes) && venetoJokes.length)
+        ? venetoJokes[Math.floor(Math.random()*venetoJokes.length)]
+        : 'Xe bon, ghe semo!';
+      return `
+        <span class="line" style="animation-delay:0ms">
+          Questa settimana al Tatone servono ${list}, per un totale di ${tot[4]} avicoli prenotati.
+        </span>
+        <br>
+        <span class="line" style="animation-delay:120ms"><em>${joke}</em></span>
+      `;
+    })();
 
     const totalsPerDay = w.rows.map(r=>r[5]);
     const maxVal = Math.max(...totalsPerDay);
@@ -601,11 +569,10 @@ function renderAgenda(weeks){
     const prepHours = Math.round((tot[4]*20)/60);
 
     statsEl.innerHTML =
-      `<span class="line" style="animation-delay:300ms)">
+      `<span class="line" style="animation-delay:300ms">
         La media giornaliera è di ${avg} capi, ${busiest} Tempo totale settimanale di preparazione: ${prepHours} ore (calcolo 20 minuti ad avicolo).
       </span>`;
 
-    // Delta vs settimana precedente (se disponibile)
     let perc = 0;
     if (idx > 0) {
       const prevTot = WEEKS[idx-1].rows.reduce((a,r)=>a+r[5],0);
@@ -613,8 +580,8 @@ function renderAgenda(weeks){
     }
     const deltaTxt = `${perc>=0?`+${perc}%`:`${perc}%`} rispetto alla settimana precedente`;
 
-    const joke=(Math.random()<0.33)?` <em style=\"opacity:.85\">${venetoJokes[Math.floor(Math.random()*venetoJokes.length)]}</em>`:'';
-    deltaEl.innerHTML = `<span class="line" style="animation-delay:600ms">${deltaTxt}${joke}</span>`;
+    const joke2=(Math.random()<0.33)?` <em style=\"opacity:.85\">${"Xe bon, ghe semo!"}</em>`:'';
+    deltaEl.innerHTML = `<span class="line" style="animation-delay:600ms">${deltaTxt}${joke2}</span>`;
 
     const atStart = (idx === 0);
     const atEnd = (idx === WEEKS.length - 1);
@@ -625,42 +592,24 @@ function renderAgenda(weeks){
     nextBtnEl.setAttribute('aria-disabled', String(atEnd));
   }
 
-  function go(delta){
-    const agenda = document.getElementById('agenda');
-    const rangeEl = agenda.querySelector('#range');
-    const currentLabel = rangeEl.textContent;
-    const currentIdx = WEEKS.findIndex(w=>w.label===currentLabel);
-    let idx = currentIdx >= 0 ? currentIdx : 0;
-    idx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1);
-    // re-render
-    // hack: reattach listeners safely
-    renderWeek.idx = idx;
-    renderWeek();
-  }
-
-  // Bind frecce
+  function go(delta){ idx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1); renderWeek(); }
   document.getElementById('prev').onclick = ()=>go(-1);
   document.getElementById('next').onclick = ()=>go(1);
-  window.addEventListener('keydown', e=>{
-    if(e.key==='ArrowLeft') go(-1);
-    else if(e.key==='ArrowRight') go(1);
-  });
+  window.addEventListener('keydown', e=>{ if(e.key==='ArrowLeft') go(-1); else if(e.key==='ArrowRight') go(1); });
 
-  // Prima render
-  renderWeek.idx = Math.min(1, WEEKS.length-1);
   renderWeek();
 }
 
 function renderPrenotati(rem){
-  // Se non ho dati, usa i valori hardcoded nel markup
   const container = document.querySelector('[data-ocapi]');
   if (!container) return;
 
   const setRow = (cls, value) => {
     const row = container.querySelector(`.${cls}.row`);
     if (!row) return;
-    row.dataset.val = String(value);
-    const valEl = row.querySelector('.val'); if (valEl) valEl.textContent = String(value);
+    const val = Math.ceil(value || 0); // <<< arrotondamento per eccesso
+    row.dataset.val = String(val);
+    const valEl = row.querySelector('.val'); if (valEl) valEl.textContent = String(val);
   };
 
   if (rem){
@@ -669,10 +618,12 @@ function renderPrenotati(rem){
     setRow("capponi", rem.c);
     setRow("polli", rem.p);
     const totalEl = container.querySelector('.ribbon .count');
-    if (totalEl) totalEl.textContent = String(rem.total);
+    if (totalEl){
+      totalEl.textContent = String(Math.ceil(rem.total)); // <<< arrotondamento per eccesso
+      totalEl.setAttribute('title', `O:${rem.o} A:${rem.a} C:${rem.c} P:${rem.p}`);
+    }
   }
 
-  // Ricalcola larghezze barre (come facevi tu)
   const rows = Array.from(container.querySelectorAll('.bars .row'));
   const values = rows.map(r => parseInt(r.dataset.val, 10) || 0);
   const max = Math.max(...values, 1);
@@ -689,28 +640,28 @@ function renderPrenotati(rem){
   });
 }
 
-function renderAvanzamento(years){
-  // RECORD (mantengo la tua nota "204 avicoli prenotati, record del 2023")
-  const RECORD = years?.record ?? 204;
-  const data = years ? {
-    y2023: years.y2023,
-    y2024: years.y2024,
-    y2025: years.y2025
-  } : {
+function renderAvanzamento(years, grandTotal, catTotals){
+  const RECORD = 204; // fisso
+  const data = {
     y2023: { Oche:71, Anatre:26, Capponi:87, Polli:20 },
     y2024: { Oche:73, Anatre:23, Capponi:71, Polli:21 },
-    y2025: { Oche:13, Anatre:23, Capponi:16, Polli:33 }
+    y2025: {
+      Oche:    (catTotals && catTotals.Oche)    ?? (years?.y2025?.Oche    ?? 0),
+      Anatre:  (catTotals && catTotals.Anatre)  ?? (years?.y2025?.Anatre  ?? 0),
+      Capponi: (catTotals && catTotals.Capponi) ?? (years?.y2025?.Capponi ?? 0),
+      Polli:   (catTotals && catTotals.Polli)   ?? (years?.y2025?.Polli   ?? 0),
+    }
   };
 
-  const tot2025 = (data.y2025.Oche + data.y2025.Anatre + data.y2025.Capponi + data.y2025.Polli);
+  const totalAll = Number.isFinite(grandTotal) ? grandTotal : 0;
 
   const totEl = document.getElementById('tot2025');
   const progFill = document.getElementById('progFill');
   const capRecordEl = document.getElementById('capRecord');
-  if (totEl) totEl.textContent = String(tot2025);
+  if (totEl) totEl.textContent = String(totalAll);
   if (capRecordEl) capRecordEl.textContent = String(RECORD);
 
-  const pctTot = Math.max(0, Math.min(100, (tot2025 / RECORD) * 100));
+  const pctTot = Math.max(0, Math.min(100, (totalAll / RECORD) * 100));
   if (progFill){
     progFill.style.width = '0%';
     void progFill.offsetWidth;
@@ -780,31 +731,31 @@ function renderAvanzamento(years){
   }
 }
 
-/* ========================
-   BOOTSTRAP
-======================== */
-(async function main(){
+function runSelfTests(){
   try{
-    const recs = await loadData();
+    const cases = [["1",1],["1,0",1],["2,5",2.5],["1.234",1234],["1.234,5",1234.5],["",0],[null,0]];
+    let ok = true;
+    for (const [inp, exp] of cases){ const got = toNumberIT(inp); if (Math.abs(got - exp) > 1e-9){ ok=false; console.error("SelfTest toNumberIT fail:", inp, got, "!=", exp); } }
+    if (ok) console.log("SelfTest toNumberIT: OK");
+  } catch(e){ console.warn("SelfTest error:", e); }
+}
 
-    // 1) Agenda (settimane dalla tabella)
+(async function main(){
+  runSelfTests();
+  try{
+    const { recs, totalAll, totalsByCat } = await loadData();
     const weeks = buildWeeks(recs);
     renderAgenda(weeks);
 
-    // 2) Prenotati (ancora da macellare = date future)
     const remaining = buildRemaining(recs, new Date());
-    renderPrenotati(remaining);
+    renderPrenotati(remaining); // Blocco 2 con CEIL
 
-    // 3) Avanzamento annuale e confronto
-    const years = buildYearCompare(recs);
-    renderAvanzamento(years);
-
-  } catch (err){
+    renderAvanzamento(null, totalAll, totalsByCat);
+  } catch ( err ){
     console.warn("Dati CSV non disponibili o incompleti, uso i demo:", err);
-    // Fallback: render con i tuoi dati demo
-    renderAgenda([]);          // userà DEMO interno
-    renderPrenotati(null);     // lascia i numeri presenti in HTML
-    renderAvanzamento(null);   // usa set demo 2023/24/25
+    renderAgenda([]);
+    renderPrenotati({o:0,a:0,c:0,p:0,total:0});
+    renderAvanzamento(null, undefined, null);
   }
 })();
 </script>
@@ -815,5 +766,3 @@ function renderAvanzamento(years){
 
 </body>
 </html>
-
-
