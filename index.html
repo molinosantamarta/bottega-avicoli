@@ -7,7 +7,7 @@
 
 <!-- ====== STILI GLOBALI MINIMI (non interferenti) ====== -->
 <style>
-  :root{ --container-w:640px; }
+  :root{ --container-w: min(96vw, 1200px); }
   html, body { height:100%; }
   body{
     margin:0; background:#0a0a0b; color:#f5f5f7;
@@ -68,6 +68,14 @@
   @media (prefers-reduced-motion: reduce){
     #agenda .summary .line{animation:fadeUpAgenda .6s forwards; background:none; -webkit-text-fill-color:unset; color:var(--muted)}
   }
+
+  /* Disattiva glow dopo il primo avvio */
+  .no-glow #agenda .summary .line{animation:fadeUpAgenda .6s forwards; background:none; -webkit-text-fill-color:unset; color:var(--muted)}
+
+  #agenda #delta .line { display:inline-block; width:100%; text-align:center; }
+
+  #avanz .hd { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #avanz .hd h1.ico { display:flex; align-items:center; justify-content:center; }
 
   @media(max-width:560px){
     #agenda .a-root{padding:10px}
@@ -176,6 +184,23 @@
     #avanz .prog{height:16px}
     #avanz .row .name{font-size:13.5px}
     #avanz .bar{height:13px}
+
+/* 1) Allarga davvero la gabbia del Blocco 2: niente centratura, ma stretch */
+#prenotati.block { align-items: stretch; }            /* override della .block */
+
+/* 2) Assicurati che la gabbia riempia la riga come nel Blocco 3 */
+#prenotati .wrap { width: 100%; max-width: var(--container-w); }
+
+/* 3) Evita che contenitori interni reintroducano limiti */
+#prenotati [data-ocapi] .card-like,
+#prenotati [data-ocapi] .panel,
+#prenotati [data-ocapi] .bars { width: 100%; max-width: none; }
+
+/* 4) Barre davvero “fluide”: la colonna centrale prende tutto lo spazio */
+#prenotati [data-ocapi] .row {
+  grid-template-columns: minmax(98px, 140px) 1fr minmax(64px, 100px);
+}
+    
   }
 </style>
 
@@ -229,37 +254,28 @@
   <section data-ocapi>
     <div class="wrap">
       <div class="card-like">
-      <section class="panel" aria-label="Ancora da macellare e dettaglio categorie">
-        <div class="ribbon" aria-live="polite" aria-label="Ancora da macellare totale">
-          <span class="label"><i class="dot-blink" aria-hidden="true"></i>Ancora da macellare</span>
-          <span class="count">0</span>
-        </div>
+        <section class="panel" aria-label="Ancora da macellare e dettaglio categorie">
+          <div class="ribbon" aria-live="polite" aria-label="Ancora da macellare totale">
+            <span class="label"><i class="dot-blink" aria-hidden="true"></i>Ancora da macellare</span>
+            <span class="count">0</span>
+          </div>
 
-        <div class="bars" role="list">
-          <div class="row oche" role="listitem" data-val="13">
-            <div class="lbl">OCHE</div>
-            <div class="bar" aria-hidden="true"><b></b></div>
-            <div class="val">13</div>
+          <div class="bars" role="list">
+            <div class="row oche" role="listitem" data-val="13">
+              <div class="lbl">OCHE</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">13</div>
+            </div>
+            <div class="row anatre" role="listitem" data-val="23">
+              <div class="lbl">ANATRE</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">23</div>
+            </div>
+            <div class="row capponi" role="listitem" data-val="16">
+              <div class="lbl">CAPPONI</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">16</div>
+            </div>
+            <div class="row polli" role="listitem" data-val="33">
+              <div class="lbl">POLLI</div><div class="bar" aria-hidden="true"><b></b></div><div class="val">33</div>
+            </div>
           </div>
-          <div class="row anatre" role="listitem" data-val="23">
-            <div class="lbl">ANATRE</div>
-            <div class="bar" aria-hidden="true"><b></b></div>
-            <div class="val">23</div>
-          </div>
-          <div class="row capponi" role="listitem" data-val="16">
-            <div class="lbl">CAPPONI</div>
-            <div class="bar" aria-hidden="true"><b></b></div>
-            <div class="val">16</div>
-          </div>
-          <div class="row polli" role="listitem" data-val="33">
-            <div class="lbl">POLLI</div>
-            <div class="bar" aria-hidden="true"><b></b></div>
-            <div class="val">33</div>
-          </div>
-        </div>
-      </section>
-    </div>
-        </div>
+        </section>
+      </div>
     </div>
   </section>
 </section>
@@ -277,7 +293,7 @@
         <div class="tot-row"><span class="lbl">Totale 2025</span><span class="val" id="tot2025">0</span></div>
         <div class="progline"><div class="prog"><b id="progFill"></b></div><span class="cap" id="capRecord">204</span></div>
       </div>
-      <p class="note">204 avicoli, record 2023</p>
+      <p class="note">204 avicoli prenotati, record del 2023</p>
     </section>
 
     <section class="card" id="card-compare">
@@ -293,15 +309,228 @@
   </main>
 </section>
 
-<!-- ====== SCRIPT BLOCCO 1 (Agenda) ====== -->
-<script>
-(() => {
-  "use strict";
-  const WEEKS = [
+<script type="module">
+/* ========================
+   CONFIG & UTILITIES
+======================== */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS6a2Ij-RW70-i-hk_Qw_0gChVKzsVljdvMjSNwqpF4CXyeHfDurxRBIcGa8AEd0HR-tNW6y_LZSn5t/pub?gid=2121991604&single=true&output=csv";
+
+// Dizionario sinonimi per intestazioni (case/accents insensitive)
+const COLMAP = {
+  data: ["data","date","giorno","day"],
+  oche: ["oche","oca","geese","goose"],
+  anatre: ["anatre","anatra","ducks","duck"],
+  capponi: ["capponi","cappone","cap","capp"],
+  polli: ["polli","pollo","pol","chicken","chickens"]
+};
+
+const IT_MONTHS = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+const IT_DAYS_SHORT = ["L","M","M","G","V","S","D"]; // Lunedì..Domenica
+const IT_DAYS_LONG = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+
+// Normalizza stringhe per match robusto
+const norm = s => s?.toString().trim().toLowerCase()
+  .normalize("NFD").replace(/\p{Diacritic}/gu,"");
+
+// CSV parser piccolo ma robusto (virgolette/virgole)
+function parseCSV(text){
+  const rows=[]; let cur="", row=[], inQ=false;
+  for (let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if (c === '"'){
+      if (inQ && n === '"'){ cur+='"'; i++; }
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ){ row.push(cur); cur=""; }
+    else if ((c === '\n' || c === '\r') && !inQ){
+      if (cur.length || row.length){ row.push(cur); rows.push(row); row=[]; cur=""; }
+    } else { cur += c; }
+  }
+  if (cur.length || row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+
+// Trova indice colonna per chiave logica (es. "oche")
+function resolveColIdx(headers, key){
+  const wanted = COLMAP[key];
+  if (!wanted) return -1;
+  for (let i=0;i<headers.length;i++){
+    const h = norm(headers[i]);
+    if (wanted.some(w => norm(w) === h)) return i;
+  }
+  return -1;
+}
+
+// Converte stringa -> numero intero sicuro
+const toInt = v => {
+  if (v == null) return 0;
+  const n = parseInt(String(v).replace(/[^\d\-]/g,""),10);
+  return Number.isFinite(n) ? n : 0;
+};
+
+// Parse data italiana o ISO (tollerante)
+function parseDate(v){
+  const s = String(v).trim();
+  // Prova ISO diretta
+  let d = new Date(s);
+  if (!isNaN(d)) return d;
+  // Prova formati tipici gg/mm/aaaa o gg-mm-aaaa
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (m){
+    const [_, dd, mm, yyyy] = m;
+    const Y = parseInt(yyyy.length===2 ? "20"+yyyy : yyyy,10);
+    const D = new Date(Y, parseInt(mm,10)-1, parseInt(dd,10));
+    if (!isNaN(D)) return D;
+  }
+  return null;
+}
+
+// Trova lunedì della settimana della data
+function mondayOf(d){
+  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dow = (dt.getDay()+6)%7; // 0 = Lunedì
+  dt.setDate(dt.getDate() - dow);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+function addDays(d,n){
+  const x = new Date(d); x.setDate(x.getDate()+n); return x;
+}
+
+// Range label tipo "7–13 Ottobre"
+function formatWeekLabel(mon){
+  const sun = addDays(mon,6);
+  const d1 = mon.getDate();
+  const d7 = sun.getDate();
+  const month = IT_MONTHS[sun.getMonth()];
+  return `${d1}\u2013${d7} ${month}`;
+}
+
+/* ========================
+   LOAD DATA FROM CSV
+======================== */
+async function loadData(){
+  const res = await fetch(CSV_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error("CSV non raggiungibile");
+  const raw = await res.text();
+  const rows = parseCSV(raw);
+  if (!rows.length) throw new Error("CSV vuoto");
+  const headers = rows[0];
+  const body = rows.slice(1);
+
+  const idx = {
+    data:   resolveColIdx(headers,"data"),
+    oche:   resolveColIdx(headers,"oche"),
+    anatre: resolveColIdx(headers,"anatre"),
+    cap:    resolveColIdx(headers,"capponi"),
+    polli:  resolveColIdx(headers,"polli"),
+  };
+
+  // Se mancano colonne essenziali, fallback sicuro
+  if (idx.data < 0) throw new Error("Colonna 'data' non trovata nel CSV");
+  // Le altre, se assenti, vengono considerate 0.
+
+  // Record normalizzati
+  const recs = body.map(r => {
+    const d = parseDate(r[idx.data]);
+    if (!d) return null;
+    return {
+      date: d,
+      y: d.getFullYear(),
+      o: toInt(r[idx.oche]),
+      a: toInt(r[idx.anatre]),
+      c: toInt(r[idx.cap]),
+      p: toInt(r[idx.polli]),
+    };
+  }).filter(Boolean);
+
+  return recs;
+}
+
+/* ========================
+   BUILD DATASETS FOR UI
+======================== */
+function buildWeeks(recs){
+  // Gruppo per settimana (Lunedì->Domenica), sommo per giorno
+  const byWeek = new Map(); // key = monday ISO string
+  for (const r of recs){
+    const mon = mondayOf(r.date);
+    const key = mon.toISOString().slice(0,10);
+    if (!byWeek.has(key)) byWeek.set(key, { mon, days: Array(7).fill(null).map(()=>({o:0,a:0,c:0,p:0})) });
+    const pack = byWeek.get(key);
+    const dow = (r.date.getDay()+6)%7; // 0..6 (L..D)
+    pack.days[dow].o += r.o;
+    pack.days[dow].a += r.a;
+    pack.days[dow].c += r.c;
+    pack.days[dow].p += r.p;
+  }
+
+  // Ordino per settimana e trasformo nel formato consumato dall’Agenda
+  const weeks = Array.from(byWeek.values()).sort((A,B)=>A.mon-B.mon).map(w=>{
+    const label = formatWeekLabel(w.mon);
+    const rows = w.days.map((d, i) => {
+      const tot = d.o + d.a + d.c + d.p;
+      const short = IT_DAYS_SHORT[i] + " " + addDays(w.mon,i).getDate();
+      return [short, d.o, d.a, d.c, d.p, tot];
+    });
+    return { label, rows };
+  });
+
+  // Se non ci sono settimane nel CSV, restituisco array vuoto (il renderer userà fallback)
+  return weeks;
+}
+
+function buildRemaining(recs, today=new Date()){
+  // "Ancora da macellare": sommo solo date >= oggi
+  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // h00
+  let O=0,A=0,C=0,P=0;
+  for (const r of recs){
+    if (r.date >= t0){ O+=r.o; A+=r.a; C+=r.c; P+=r.p; }
+  }
+  return { o:O, a:A, c:C, p:P, total: O+A+C+P };
+}
+
+function buildYearCompare(recs){
+  const years = new Map(); // y -> {Oche,Anatre,Capponi,Polli}
+  for (const r of recs){
+    if (!years.has(r.y)) years.set(r.y, { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 });
+    const y = years.get(r.y);
+    y.Oche   += r.o;
+    y.Anatre += r.a;
+    y.Capponi+= r.c;
+    y.Polli  += r.p;
+    y.tot    += r.o + r.a + r.c + r.p;
+  }
+
+  // Prendo 2023, 2024, 2025 se esistono (mantenendo l’ordine UI)
+  const y2023 = years.get(2023) || { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 };
+  const y2024 = years.get(2024) || { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 };
+  const y2025 = years.get(2025) || { Oche:0, Anatre:0, Capponi:0, Polli:0, tot:0 };
+
+  // Record storico (mantengo 204 se vuoi fisso) oppure calcolo max storico
+  const record = Math.max(204, y2023.tot, y2024.tot); // così non “rompo” la tua nota UI
+
+  return { y2023, y2024, y2025, record };
+}
+
+/* ========================
+   RENDERERS (stessa UI)
+======================== */
+function renderAgenda(weeks){
+  // Fallback ai dati demo se weeks è vuoto
+  const DEMO = [
     { label: '7–13 Ottobre',  rows: [['L 7',1,0,2,1,4],['M 8',0,1,3,1,5],['M 9',2,0,1,2,5],['G 10',1,1,0,1,3],['V 11',2,2,1,2,7],['S 12',1,3,1,1,6],['D 13',0,1,2,1,4]] },
     { label: '14–20 Ottobre', rows: [['L 14',1,0,3,2,6],['M 15',0,1,4,1,6],['M 16',2,0,1,3,6],['G 17',3,2,0,1,6],['V 18',1,2,3,2,8],['S 19',0,3,1,1,5],['D 20',2,1,2,2,7]] },
     { label: '21–27 Ottobre', rows: [['L 21',0,2,1,1,4],['M 22',1,0,2,2,5],['M 23',2,1,3,1,7],['G 24',1,2,1,1,5],['V 25',0,3,0,2,5],['S 26',1,1,2,0,4],['D 27',2,2,2,1,7]] }
   ];
+  const WEEKS = weeks && weeks.length ? weeks : DEMO;
+
+  // Battute venete (mantengo il tuo sistema + fallback locale)
+  const JOKES_URL = './veneto-jokes.json';
+  const venetoJokesFallback = ["Xe bon, ghe semo!"];
+  let venetoJokes = [...venetoJokesFallback];
+  fetch(JOKES_URL, { cache:'no-store' }).then(r=>r.ok?r.json():[]).then(arr=>{
+    if (Array.isArray(arr) && arr.length) venetoJokes = arr.filter(s=>typeof s==='string' && s.trim());
+  }).catch(()=>{});
 
   const agenda = document.getElementById('agenda');
   const tbody = agenda.querySelector('#tabella tbody');
@@ -313,7 +542,15 @@
   const prevBtn = agenda.querySelector('#prev');
   const nextBtn = agenda.querySelector('#next');
 
-  let idx = 1;
+  // glow una sola volta (rispetto tua logica)
+  const firstRunKey = "agendaGlowDone";
+  if (localStorage.getItem(firstRunKey)) {
+    document.body.classList.add("no-glow");
+  } else {
+    localStorage.setItem(firstRunKey, "1");
+  }
+
+  let idx = Math.min(1, WEEKS.length-1); // apri sulla settimana centrale se possibile
 
   const itNum = (n, dec=1) => Number(n).toFixed(dec).replace('.', ',');
   const getOpacity = (value) => Math.min(value/10, 1).toFixed(2);
@@ -355,9 +592,8 @@
 
     const totalsPerDay = w.rows.map(r=>r[5]);
     const maxVal = Math.max(...totalsPerDay);
-    const dayNames = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
     const maxIdxs = totalsPerDay.map((v,i)=>v===maxVal?i:null).filter(i=>i!==null);
-    const daysStr = maxIdxs.map(i=>dayNames[i]).join(', ');
+    const daysStr = maxIdxs.map(i=>IT_DAYS_LONG[i]).join(', ');
     const busiest = maxIdxs.length>1
       ? `i giorni più carichi sono ${daysStr} con ${maxVal} capi.`
       : `il giorno più carico è ${daysStr} con ${maxVal} capi.`;
@@ -365,65 +601,83 @@
     const prepHours = Math.round((tot[4]*20)/60);
 
     statsEl.innerHTML =
-      `<span class="line" style="animation-delay:300ms">
+      `<span class="line" style="animation-delay:300ms)">
         La media giornaliera è di ${avg} capi, ${busiest} Tempo totale settimanale di preparazione: ${prepHours} ore (calcolo 20 minuti ad avicolo).
       </span>`;
 
-    let deltaTxt = 'Variazione rispetto alla settimana precedente: n.d.';
-    if(idx>0){
-      const prevTot = [0,0,0,0,0];
-      for (const r of WEEKS[idx-1].rows){ prevTot[0]+=r[1]; prevTot[1]+=r[2]; prevTot[2]+=r[3]; prevTot[3]+=r[4]; prevTot[4]+=r[5]; }
-      const base = prevTot[4];
-      if(base>0){
-        const perc = Math.round(((tot[4]-base)/base)*100);
-        deltaTxt = `Variazione rispetto alla settimana precedente: ${perc>0?`+${perc}%`:`${perc}%`}`;
-      }
+    // Delta vs settimana precedente (se disponibile)
+    let perc = 0;
+    if (idx > 0) {
+      const prevTot = WEEKS[idx-1].rows.reduce((a,r)=>a+r[5],0);
+      if (prevTot > 0) perc = Math.round(((tot[4]-prevTot)/prevTot)*100);
     }
-    
-    // ⬇⬇⬇ BATTUTE IN VENETO: qui c'è l'array usato per aggiungere una battuta casuale alla riga delta
-    const venetoJokes=["Xe bon, ghe semo!","Dai, no star ciapar freddo!","Va ben, ma no esagerar, neh!","Tasi un fià e tira riga!"]; 
-    // ↑↑↑ Puoi aggiungere qui nuove frasi/ barzellette lunghe in veneto, come stringhe dell'array
+    const deltaTxt = `${perc>=0?`+${perc}%`:`${perc}%`} rispetto alla settimana precedente`;
 
-    const joke=(Math.random()<0.33)?` <em style=\"opacity:.85\">${venetoJokes[Math.floor(Math.random()*venetoJokes.length)]}</em>`:''; 
+    const joke=(Math.random()<0.33)?` <em style=\"opacity:.85\">${venetoJokes[Math.floor(Math.random()*venetoJokes.length)]}</em>`:'';
     deltaEl.innerHTML = `<span class="line" style="animation-delay:600ms">${deltaTxt}${joke}</span>`;
 
     const atStart = (idx === 0);
     const atEnd = (idx === WEEKS.length - 1);
-    prevBtn.disabled = atStart; nextBtn.disabled = atEnd;
-    prevBtn.setAttribute('aria-disabled', String(atStart));
-    nextBtn.setAttribute('aria-disabled', String(atEnd));
+    const prevBtnEl = document.getElementById('prev');
+    const nextBtnEl = document.getElementById('next');
+    prevBtnEl.disabled = atStart; nextBtnEl.disabled = atEnd;
+    prevBtnEl.setAttribute('aria-disabled', String(atStart));
+    nextBtnEl.setAttribute('aria-disabled', String(atEnd));
   }
 
   function go(delta){
-    const nextIdx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1);
-    if (nextIdx === idx) return;
-    idx = nextIdx; renderWeek();
+    const agenda = document.getElementById('agenda');
+    const rangeEl = agenda.querySelector('#range');
+    const currentLabel = rangeEl.textContent;
+    const currentIdx = WEEKS.findIndex(w=>w.label===currentLabel);
+    let idx = currentIdx >= 0 ? currentIdx : 0;
+    idx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1);
+    // re-render
+    // hack: reattach listeners safely
+    renderWeek.idx = idx;
+    renderWeek();
   }
 
-  prevBtn.addEventListener('click', ()=>go(-1));
-  nextBtn.addEventListener('click', ()=>go(1));
+  // Bind frecce
+  document.getElementById('prev').onclick = ()=>go(-1);
+  document.getElementById('next').onclick = ()=>go(1);
   window.addEventListener('keydown', e=>{
     if(e.key==='ArrowLeft') go(-1);
     else if(e.key==='ArrowRight') go(1);
   });
 
+  // Prima render
+  renderWeek.idx = Math.min(1, WEEKS.length-1);
   renderWeek();
-})();
-</script>
+}
 
-<!-- ====== SCRIPT BLOCCO 2 (Prenotati) ====== -->
-<script>
-(() => {
-  "use strict";
+function renderPrenotati(rem){
+  // Se non ho dati, usa i valori hardcoded nel markup
   const container = document.querySelector('[data-ocapi]');
+  if (!container) return;
+
+  const setRow = (cls, value) => {
+    const row = container.querySelector(`.${cls}.row`);
+    if (!row) return;
+    row.dataset.val = String(value);
+    const valEl = row.querySelector('.val'); if (valEl) valEl.textContent = String(value);
+  };
+
+  if (rem){
+    setRow("oche", rem.o);
+    setRow("anatre", rem.a);
+    setRow("capponi", rem.c);
+    setRow("polli", rem.p);
+    const totalEl = container.querySelector('.ribbon .count');
+    if (totalEl) totalEl.textContent = String(rem.total);
+  }
+
+  // Ricalcola larghezze barre (come facevi tu)
   const rows = Array.from(container.querySelectorAll('.bars .row'));
   const values = rows.map(r => parseInt(r.dataset.val, 10) || 0);
   const max = Math.max(...values, 1);
-
   rows.forEach((r,i) => {
     const v = values[i];
-    const valEl = r.querySelector('.val');
-    if(valEl) valEl.textContent = String(v);
     const b = r.querySelector('.bar b');
     if(b){
       let pct = (v / max) * 100;
@@ -433,112 +687,133 @@
       requestAnimationFrame(()=>{ b.style.width = pct + '%'; });
     }
   });
+}
 
-  const total = values.reduce((a,b)=>a+b,0);
-  const totalEl = container.querySelector('.ribbon .count');
-  if(totalEl) totalEl.textContent = String(total);
-})();
-</script>
-
-<!-- ====== SCRIPT BLOCCO 3 (Avanzamento 2025) ====== -->
-<script>
-(() => {
-  "use strict";
-  const RECORD = 204; // record 2023
-  const data = {
+function renderAvanzamento(years){
+  // RECORD (mantengo la tua nota "204 avicoli prenotati, record del 2023")
+  const RECORD = years?.record ?? 204;
+  const data = years ? {
+    y2023: years.y2023,
+    y2024: years.y2024,
+    y2025: years.y2025
+  } : {
     y2023: { Oche:71, Anatre:26, Capponi:87, Polli:20 },
     y2024: { Oche:73, Anatre:23, Capponi:71, Polli:21 },
     y2025: { Oche:13, Anatre:23, Capponi:16, Polli:33 }
   };
 
-  function render() {
-    const totEl = document.getElementById('tot2025');
-    const progFill = document.getElementById('progFill');
-    const capRecordEl = document.getElementById('capRecord');
+  const tot2025 = (data.y2025.Oche + data.y2025.Anatre + data.y2025.Capponi + data.y2025.Polli);
 
-    // Totale demo impostato a 133 come richiesto
-    const total2025 = 133;
+  const totEl = document.getElementById('tot2025');
+  const progFill = document.getElementById('progFill');
+  const capRecordEl = document.getElementById('capRecord');
+  if (totEl) totEl.textContent = String(tot2025);
+  if (capRecordEl) capRecordEl.textContent = String(RECORD);
 
-    if (totEl) totEl.textContent = String(total2025);
-    if (capRecordEl) capRecordEl.textContent = String(RECORD);
-    const pctTot = Math.max(0, Math.min(100, (total2025 / RECORD) * 100));
-    if (progFill){
-      progFill.style.width = '0%';
-      void progFill.offsetWidth;
-      progFill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
-      progFill.style.width = pctTot + '%';
-    }
-
-    const rowsWrap = document.getElementById('rows');
-    if (!rowsWrap) return;
-    rowsWrap.innerHTML = '';
-    const cats = Object.keys(data.y2025);
-    const maxByCat = {};
-    for (const cat of cats){
-      maxByCat[cat] = Math.max(data.y2023[cat]||0, data.y2024[cat]||0, data.y2025[cat]||0, 1);
-    }
-
-    const mkRow = (cat) => {
-      const wrap = document.createElement('div');
-      wrap.className = 'row';
-      const title = document.createElement('div');
-      title.className = 'name';
-      title.textContent = cat.toUpperCase();
-      wrap.appendChild(title);
-
-      const bars = document.createElement('div');
-      bars.className = 'bars';
-      wrap.appendChild(bars);
-
-      const years = [
-        { color:'y2025', val:data.y2025[cat]||0 },
-        { color:'y2024', val:data.y2024[cat]||0 },
-        { color:'y2023', val:data.y2023[cat]||0 }
-      ];
-
-      for (const y of years){
-        const line = document.createElement('div');
-        line.className = 'barline';
-        const bar = document.createElement('div');
-        bar.className = 'bar ' + y.color;
-        const fill = document.createElement('b');
-        fill.style.width = '0%';
-        fill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
-        bar.appendChild(fill);
-
-        const tag = document.createElement('span');
-        tag.className = 'tag';
-        tag.textContent = y.val;
-
-        line.appendChild(bar);
-        line.appendChild(tag);
-        bars.appendChild(line);
-
-        let pct = Math.max(0, Math.min(100, (y.val / maxByCat[cat]) * 100));
-        if (y.val > 0) pct = Math.max(pct, 7);
-        requestAnimationFrame(()=>{ fill.style.width = pct + '%'; });
-      }
-
-      const v25 = data.y2025[cat]||0, v24 = data.y2024[cat]||0;
-      const delta = v24===0 ? 0 : Math.round(((v25 - v24) / v24) * 100);
-      const d = document.createElement('span');
-      d.className = 'delta ' + (delta>=0 ? 'up':'down');
-      d.textContent = (delta>=0?'+':'') + delta + '%';
-      title.appendChild(d);
-
-      return wrap;
-    };
-
-    for (const cat of cats){ rowsWrap.appendChild(mkRow(cat)); }
+  const pctTot = Math.max(0, Math.min(100, (tot2025 / RECORD) * 100));
+  if (progFill){
+    progFill.style.width = '0%';
+    void progFill.offsetWidth;
+    progFill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
+    progFill.style.width = pctTot + '%';
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', render, { once:true });
-  } else {
-    render();
+  const rowsWrap = document.getElementById('rows');
+  if (!rowsWrap) return;
+  rowsWrap.innerHTML = '';
+
+  const cats = ["Oche","Anatre","Capponi","Polli"];
+  const maxByCat = {};
+  for (const cat of cats){
+    maxByCat[cat] = Math.max(data.y2023[cat]||0, data.y2024[cat]||0, data.y2025[cat]||0, 1);
+  }
+
+  for (const cat of cats){
+    const wrap = document.createElement('div');
+    wrap.className = 'row';
+    const title = document.createElement('div');
+    title.className = 'name';
+    title.textContent = cat.toUpperCase();
+    wrap.appendChild(title);
+
+    const bars = document.createElement('div');
+    bars.className = 'bars';
+    wrap.appendChild(bars);
+
+    const yearsArr = [
+      { color:'y2025', val:data.y2025[cat]||0 },
+      { color:'y2024', val:data.y2024[cat]||0 },
+      { color:'y2023', val:data.y2023[cat]||0 }
+    ];
+
+    for (const y of yearsArr){
+      const line = document.createElement('div');
+      line.className = 'barline';
+      const bar = document.createElement('div');
+      bar.className = 'bar ' + y.color;
+      const fill = document.createElement('b');
+      fill.style.width = '0%';
+      fill.style.transition = 'width .6s cubic-bezier(.22,.72,.24,1)';
+      bar.appendChild(fill);
+
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = y.val;
+
+      line.appendChild(bar);
+      line.appendChild(tag);
+      bars.appendChild(line);
+
+      let pct = Math.max(0, Math.min(100, (y.val / maxByCat[cat]) * 100));
+      if (y.val > 0) pct = Math.max(pct, 7);
+      requestAnimationFrame(()=>{ fill.style.width = pct + '%'; });
+    }
+
+    const v25 = data.y2025[cat]||0, v24 = data.y2024[cat]||0;
+    const delta = v24===0 ? 0 : Math.round(((v25 - v24) / v24) * 100);
+    const d = document.createElement('span');
+    d.className = 'delta ' + (delta>=0 ? 'up':'down');
+    d.textContent = (delta>=0?'+':'') + delta + '%';
+    title.appendChild(d);
+
+    rowsWrap.appendChild(wrap);
+  }
+}
+
+/* ========================
+   BOOTSTRAP
+======================== */
+(async function main(){
+  try{
+    const recs = await loadData();
+
+    // 1) Agenda (settimane dalla tabella)
+    const weeks = buildWeeks(recs);
+    renderAgenda(weeks);
+
+    // 2) Prenotati (ancora da macellare = date future)
+    const remaining = buildRemaining(recs, new Date());
+    renderPrenotati(remaining);
+
+    // 3) Avanzamento annuale e confronto
+    const years = buildYearCompare(recs);
+    renderAvanzamento(years);
+
+  } catch (err){
+    console.warn("Dati CSV non disponibili o incompleti, uso i demo:", err);
+    // Fallback: render con i tuoi dati demo
+    renderAgenda([]);          // userà DEMO interno
+    renderPrenotati(null);     // lascia i numeri presenti in HTML
+    renderAvanzamento(null);   // usa set demo 2023/24/25
   }
 })();
 </script>
 
+<footer style="text-align:center;padding:24px 0;font-size:12px;color:#a7abb1;letter-spacing:.3px;border-top:1px solid #232429;margin-top:40px;">
+  <em>© Ocapì – La Bottega di Casterno 2025 – tutti i diritti riservati</em>
+</footer>
+
 </body>
 </html>
+
+
