@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Dashboard Avicoli — Blocchi Integrati</title>
 
-<!-- ====== STILI GLOBALI MINIMI (non interferenti) ====== -->
 <style>
 body::before { content: ""; display: block; height: 40px; }
 :root{ --container-w: min(96vw, 1200px); }
@@ -20,14 +19,13 @@ body{
 .block h1.block-title{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 </style>
 
-<!-- Uniform wrap per tutti i blocchi (stessa gabbia del Blocco 3) -->
 <style>
   .wrap{width:100%;max-width:var(--container-w);margin:0 auto;display:grid;gap:14px}
 </style>
 
-<!-- ====== BLOCCO 1: Agenda Macellazione — Navigazione Settimane ====== -->
 <style>
-  #agenda { --bg:#0b0b0c; --panel:#16181c; --border:#2b2d31; --text:#f5f5f7; --accent:#ffd60a; --muted:#9ea1a5; --radius:10px; --shadow:0 6px 18px rgba(0,0,0,.35); }
+  #agenda { --bg:#0b0b0c; --panel:#16181c; --border:#2b2d31; --text:#f5f5f7; --accent:#ffd60a; --muted:#9ea1a5; --radius:10px; --shadow:0 6px 18px rgba(0,0,0,.35);
+            --tot-week-bg:#ffd60a; --tot-week-text:#000; }
   #agenda .a-root{background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;}
   #agenda .a-root h1{font-size:18px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin:0}
 
@@ -72,6 +70,10 @@ body{
   #avanz .hd { display:flex; flex-direction:column; align-items:center; justify-content:center; }
   #avanz .hd h1.ico { display:flex; align-items:center; justify-content:center; }
 
+  #agenda .tot{display:inline-block;font-weight:900;color:var(--accent);background:transparent;border:none;padding:0;min-width:auto;font-size:14px;letter-spacing:.2px}
+  #agenda .tot-foot{display:inline-block;font-weight:900;color:var(--accent);background:transparent;border:none;padding:0;min-width:auto;font-size:14px;letter-spacing:.2px}
+  #agenda .td-tot-week{background:var(--tot-week-bg)!important;color:var(--tot-week-text)!important;font-weight:900}
+
   @media(max-width:560px){
     #agenda .a-root{padding:10px}
     #agenda table{font-size:10px}
@@ -82,7 +84,6 @@ body{
   }
 </style>
 
-<!-- ====== BLOCCO 2: Avicoli prenotati ====== -->
 <style>
   [data-ocapi]{
     --bg:#0a0a0b; --panel:#14161a; --panel-2:#1a1d22; --fg:#f3f4f5; --muted:#a7abb1; --hair:#262a30; --accent:#f2cf57;
@@ -114,7 +115,6 @@ body{
     [data-ocapi] .lbl{font-size:15px}
   }
 
-  /* Mobile tweaks del blocco 2 */
   @media (max-width:430px){
     #prenotati.block { align-items: stretch; }
     #prenotati .wrap { width: 100%; max-width: var(--container-w); }
@@ -125,7 +125,6 @@ body{
   }
 </style>
 
-<!-- ====== BLOCCO 3: Avanzamento 2025 e Confronti ====== -->
 <style>
   #avanz{
     --bg:#0a0a0b; --panel:#14161a; --panel-2:#1a1d22; --hair:#262a30; --fg:#eef0f3; --muted:#a7abb1; --hl:#f2cf57;
@@ -166,7 +165,6 @@ body{
   #avanz .note{ text-align:center; font-size:11px; color:#a7abb1; margin-top:4px; }
 </style>
 
-<!-- ====== Icone minimal (gialle) ====== -->
 <style>
   .ico{display:inline-flex;align-items:center;gap:8px;color:#f2cf57}
   .ico::before{content:"";display:inline-block;width:1.05em;height:1.05em;background:currentColor;mask-size:contain;mask-repeat:no-repeat;mask-position:center;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;margin-right:6px}
@@ -178,7 +176,6 @@ body{
 </head>
 <body>
 
-<!-- ====== BLOCCO 1: AGENDA MACELLAZIONE ====== -->
 <section id="agenda" class="block" aria-labelledby="bl1">
   <h1 id="bl1" class="block-title">Blocco 1 • Agenda macellazione</h1>
   <div class="a-root" aria-label="Agenda macellazione">
@@ -207,7 +204,6 @@ body{
   </div>
 </section>
 
-<!-- ====== BLOCCO 2: AVICOLI PRENOTATI ====== -->
 <section class="block" id="prenotati" aria-labelledby="bl2">
   <h1 id="bl2" class="block-title">Blocco 2 • Avicoli prenotati</h1>
   <section data-ocapi>
@@ -239,7 +235,6 @@ body{
   </section>
 </section>
 
-<!-- ====== BLOCCO 3: AVANZAMENTO 2025 E CONFRONTI ====== -->
 <section id="avanz" class="block" aria-labelledby="bl3">
   <h1 id="bl3" class="block-title">Blocco 3 • Avanzamento 2025 e confronti</h1>
   <main class="wrap">
@@ -268,11 +263,7 @@ body{
   </main>
 </section>
 
-<!-- ====== SCRIPT UNIFICATO (CSV + RENDER) ====== -->
 <script type="module">
-/* ========================
-   CONFIG & UTILITIES
-======================== */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS6a2Ij-RW70-i-hk_Qw_0gChVKzsVljdvMjSNwqpF4CXyeHfDurxRBIcGa8AEd0HR-tNW6y_LZSn5t/pub?gid=2121991604&single=true&output=csv";
 
 const COLMAP = {
@@ -284,31 +275,26 @@ const COLMAP = {
 };
 
 const IT_MONTHS = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
-const IT_DAYS_SHORT = ["L","M","M","G","V","S","D"]; // Lunedì..Domenica
+const IT_DAYS_SHORT = ["L","M","M","G","V","S","D"];
 const IT_DAYS_LONG = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
 
-const norm = s => s?.toString().trim().toLowerCase()
-  .normalize("NFD").replace(/\p{Diacritic}/gu,"");
+const norm = s => s?.toString().trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"");
 
 function parseCSV(text){
   const rows=[]; let cur="", row=[], inQ=false;
   for (let i=0;i<text.length;i++){
     const c=text[i], n=text[i+1];
-    if (c === '"'){
-      if (inQ && n === '"'){ cur+='"'; i++; }
-      else inQ = !inQ;
-    } else if (c === ',' && !inQ){ row.push(cur); cur=""; }
-    else if ((c === '\n' || c === '\r') && !inQ){
-      if (cur.length || row.length){ row.push(cur); rows.push(row); row=[]; cur=""; }
-    } else { cur += c; }
+    if (c === '"'){ if (inQ && n === '"'){ cur+='"'; i++; } else inQ = !inQ; }
+    else if (c === ',' && !inQ){ row.push(cur); cur=""; }
+    else if ((c === '\n' || c === '\r') && !inQ){ if (cur.length || row.length){ row.push(cur); rows.push(row); row=[]; cur=""; } }
+    else { cur += c; }
   }
   if (cur.length || row.length){ row.push(cur); rows.push(row); }
   return rows;
 }
 
-function resolveColIdx(headers, key){
-  const wanted = COLMAP[key];
-  if (!wanted) return -1;
+function resolveColIdx(headers,key){
+  const wanted = COLMAP[key] || [];
   for (let i=0;i<headers.length;i++){
     const h = norm(headers[i]);
     if (wanted.some(w => norm(w) === h)) return i;
@@ -316,12 +302,11 @@ function resolveColIdx(headers, key){
   return -1;
 }
 
-// Parsing numeri in formato italiano (virgola decimale)
 function toNumberIT(v){
   if (v == null) return 0;
-  const s = String(v).trim().replace(/\s+/g, '');
+  const s = String(v).trim().replace(/\s+/g,'');
   if (!s) return 0;
-  const normalized = s.replace(/\./g, '').replace(',', '.');
+  const normalized = s.replace(/\./g,'').replace(',','.');
   const n = parseFloat(normalized);
   return Number.isFinite(n) ? n : 0;
 }
@@ -330,86 +315,53 @@ function parseDate(v){
   if (v == null) return null;
   let s = String(v).trim();
   if (!s) return null;
-
-  // Tieni solo la parte di data se c'è anche orario
   s = s.split('T')[0].split(' ')[0];
-
-  // ISO (YYYY-MM-DD)
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (iso){
-    const Y = parseInt(iso[1],10), M = parseInt(iso[2],10)-1, D = parseInt(iso[3],10);
-    const d = new Date(Y, M, D);
-    return isNaN(d) ? null : d;
-  }
-
-  // Locale (DD/MM/YYYY o DD-MM-YYYY)
+  if (iso){ const d = new Date(+iso[1], +iso[2]-1, +iso[3]); return isNaN(d)?null:d; }
   const loc = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-  if (loc){
-    const dd = parseInt(loc[1],10), mm = parseInt(loc[2],10), yyyy = parseInt(loc[3].length===2?('20'+loc[3]):loc[3],10);
-    const d = new Date(yyyy, mm-1, dd);
-    return isNaN(d) ? null : d;
-  }
-
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
+  if (loc){ const y = loc[3].length===2 ? +("20"+loc[3]) : +loc[3]; const d = new Date(y, +loc[2]-1, +loc[1]); return isNaN(d)?null:d; }
+  const d = new Date(s); return isNaN(d)?null:d;
 }
 
 function mondayOf(d){
-  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const dow = (dt.getDay()+6)%7;
-  dt.setDate(dt.getDate() - dow);
-  dt.setHours(0,0,0,0);
-  return dt;
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dow = (x.getDay()+6)%7;
+  x.setDate(x.getDate()-dow); x.setHours(0,0,0,0); return x;
 }
-function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+const addDays = (d,n)=>{ const x = new Date(d); x.setDate(x.getDate()+n); return x; };
 function formatWeekLabel(mon){
   const sun = addDays(mon,6);
-  const d1 = mon.getDate();
-  const d7 = sun.getDate();
-  const month = IT_MONTHS[sun.getMonth()];
-  return `${d1}\u2013${d7} ${month}`;
+  return `${mon.getDate()}–${sun.getDate()} ${IT_MONTHS[sun.getMonth()]} ${sun.getFullYear()}`;
 }
+const getOpacity = v => Math.min(v/10,1).toFixed(2);
 
 async function loadData(){
-  const res = await fetch(CSV_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error("CSV non raggiungibile");
+  const res = await fetch(CSV_URL, { cache:'no-store', mode:'cors' });
+  if (!res.ok) throw new Error('CSV non raggiungibile');
   const raw = await res.text();
+  if (!raw || !raw.trim()) throw new Error('CSV vuoto');
   const rows = parseCSV(raw);
-  if (!rows.length) throw new Error("CSV vuoto");
-  const headers = rows[0];
+  const headers = rows[0] ?? [];
   const body = rows.slice(1);
 
   let idx = {
-    data:   resolveColIdx(headers, "data"),
-    oche:   resolveColIdx(headers, "oche"),
-    anatre: resolveColIdx(headers, "anatre"),
-    cap:    resolveColIdx(headers, "capponi"),
-    polli:  resolveColIdx(headers, "polli"),
+    data:   resolveColIdx(headers,'data'),
+    oche:   resolveColIdx(headers,'oche'),
+    anatre: resolveColIdx(headers,'anatre'),
+    cap:    resolveColIdx(headers,'capponi'),
+    polli:  resolveColIdx(headers,'polli'),
   };
-  // Fallback robusti sugli indici se le intestazioni mancano/sono non standard
-  if (idx.data   < 0) idx.data   = 0;  // prima colonna = data
-  if (idx.oche   < 0) idx.oche   = 1;  // B
-  if (idx.anatre < 0) idx.anatre = 2;  // C
-  if (idx.cap    < 0) idx.cap    = 3;  // D
-  if (idx.polli  < 0) idx.polli  = 4;  // E
+  if (idx.data   < 0) idx.data   = 0;
+  if (idx.oche   < 0) idx.oche   = 1;
+  if (idx.anatre < 0) idx.anatre = 2;
+  if (idx.cap    < 0) idx.cap    = 3;
+  if (idx.polli  < 0) idx.polli  = 4;
 
-  let recs = [];
-  if (idx.data >= 0){
-    recs = body.map(r => {
-      const d = parseDate(r[idx.data]);
-      if (!d) return null;
-      return {
-        date: d,
-        y: d.getFullYear(),
-        o: toNumberIT(r[idx.oche]),
-        a: toNumberIT(r[idx.anatre]),
-        c: toNumberIT(r[idx.cap]),
-        p: toNumberIT(r[idx.polli]),
-      };
-    }).filter(Boolean);
-  }
+  const recs = body.map(r=>{
+    const d = parseDate(r[idx.data]); if (!d) return null;
+    return { date:d, o:toNumberIT(r[idx.oche])|0, a:toNumberIT(r[idx.anatre])|0, c:toNumberIT(r[idx.cap])|0, p:toNumberIT(r[idx.polli])|0 };
+  }).filter(Boolean).sort((A,B)=>A.date-B.date);
 
-  // Totale globale e totali per categoria (arrotondati SOLO quando mostrati)
   let totalAllFloat = 0;
   const totalsByCatFloat = { Oche:0, Anatre:0, Capponi:0, Polli:0 };
   for (const r of body){
@@ -434,60 +386,52 @@ async function loadData(){
   return { recs, totalAll, totalsByCat };
 }
 
-function buildWeeks(recs){
+function buildWeeksAllYear(recs){
+  const year = new Date().getFullYear();
+  const yStart = new Date(year,0,1);
+  const yEnd = new Date(year,11,31);
+  const firstMon = mondayOf(yStart);
+  const lastMon = mondayOf(yEnd);
+
   const byWeek = new Map();
+  for (let cur = new Date(firstMon); cur <= lastMon; cur = addDays(cur,7)){
+    const key = cur.toISOString().slice(0,10);
+    byWeek.set(key, { mon: new Date(cur), days: Array(7).fill(0).map(()=>({o:0,a:0,c:0,p:0})) });
+  }
+
   for (const r of recs){
+    if (r.date.getFullYear() !== year) continue;
     const mon = mondayOf(r.date);
     const key = mon.toISOString().slice(0,10);
-    if (!byWeek.has(key)) byWeek.set(key, { mon, days: Array(7).fill(null).map(()=>({o:0,a:0,c:0,p:0})) });
     const pack = byWeek.get(key);
     const dow = (r.date.getDay()+6)%7;
-    pack.days[dow].o += r.o;
-    pack.days[dow].a += r.a;
-    pack.days[dow].c += r.c;
-    pack.days[dow].p += r.p;
+    const d = pack.days[dow]; d.o += r.o; d.a += r.a; d.c += r.c; d.p += r.p;
   }
+
   const weeks = Array.from(byWeek.values()).sort((A,B)=>A.mon-B.mon).map(w=>{
-    const label = formatWeekLabel(w.mon);
     const rows = w.days.map((d, i) => {
+      const dd = addDays(w.mon,i);
+      const label = `${IT_DAYS_SHORT[i]} ${dd.getDate()}`;
       const tot = d.o + d.a + d.c + d.p;
-      const short = IT_DAYS_SHORT[i] + " " + addDays(w.mon,i).getDate();
-      return [short, d.o, d.a, d.c, d.p, tot];
+      return [label, d.o, d.a, d.c, d.p, tot];
     });
-    return { label, rows };
+    return { label: formatWeekLabel(w.mon), key: w.mon.toISOString().slice(0,10), mon: w.mon, rows };
   });
+
   return weeks;
 }
 
 function buildRemaining(recs, today=new Date()){
-  // Confronto per GIORNO (locale): includi TUTTO l’oggi e i giorni futuri
   const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-  let O=0, A=0, C=0, P=0; // somme in floating point
+  let O=0, A=0, C=0, P=0;
   for (const r of recs){
     const rd = new Date(r.date.getFullYear(), r.date.getMonth(), r.date.getDate());
-    if (rd >= t0){
-      O += r.o; A += r.a; C += r.c; P += r.p;
-    }
+    if (rd >= t0){ O += r.o; A += r.a; C += r.c; P += r.p; }
   }
-  // Nessun arrotondamento qui: lo faremo in renderPrenotati con Math.ceil
   return { o:O, a:A, c:C, p:P, total: O + A + C + P };
 }
 
 function renderAgenda(weeks){
-  const DEMO = [
-    { label: '7–13 Ottobre',  rows: [['L 7',1,0,2,1,4],['M 8',0,1,3,1,5],['M 9',2,0,1,2,5],['G 10',1,1,0,1,3],['V 11',2,2,1,2,7],['S 12',1,3,1,1,6],['D 13',0,1,2,1,4]] },
-    { label: '14–20 Ottobre', rows: [['L 14',1,0,3,2,6],['M 15',0,1,4,1,6],['M 16',2,0,1,3,6],['G 17',3,2,0,1,6],['V 18',1,2,3,2,8],['S 19',0,3,1,1,5],['D 20',2,1,2,2,7]] },
-    { label: '21–27 Ottobre', rows: [['L 21',0,2,1,1,4],['M 22',1,0,2,2,5],['M 23',2,1,3,1,7],['G 24',1,2,1,1,5],['V 25',0,3,0,2,5],['S 26',1,1,2,0,4],['D 27',2,2,2,1,7]] }
-  ];
-  const WEEKS = weeks && weeks.length ? weeks : DEMO;
-
-  const JOKES_URL = './veneto-jokes.json';
-  let venetoJokes = ["Xe bon, ghe semo!"];
-  fetch(JOKES_URL, { cache:'no-store' }).then(r=>r.ok?r.json():[]).then(arr=>{
-    if (Array.isArray(arr) && arr.length) venetoJokes = arr.filter(s=>typeof s==='string' && s.trim());
-  }).catch(()=>{});
-
   const agenda = document.getElementById('agenda');
   const tbody = agenda.querySelector('#tabella tbody');
   const tfoot = agenda.querySelector('#tabella tfoot');
@@ -497,94 +441,74 @@ function renderAgenda(weeks){
   const deltaEl = agenda.querySelector('#delta');
 
   const firstRunKey = "agendaGlowDone";
-  if (localStorage.getItem(firstRunKey)) {
-    document.body.classList.add("no-glow");
-  } else {
-    localStorage.setItem(firstRunKey, "1");
-  }
+  if (localStorage.getItem(firstRunKey)) document.body.classList.add("no-glow"); else localStorage.setItem(firstRunKey, "1");
 
-  let idx = Math.min(1, WEEKS.length-1);
-  const itNum = (n, dec=1) => Number(n).toFixed(dec).replace('.', ',');
-  const getOpacity = (value) => Math.min(value/10, 1).toFixed(2);
+  const cell = v => v ? `<span class="v" style="background-color:rgba(255,214,10,${getOpacity(v)})">${v}</span>` : '';
+  const totCell = v => v ? `<span class="tot">${v}</span>` : '';
+
+  const todayKey = mondayOf(new Date()).toISOString().slice(0,10);
+  let idx = Math.max(0, weeks.findIndex(w => w.key === todayKey));
+  if (idx < 0) idx = weeks.length - 1;
 
   function renderWeek(){
-    const w = WEEKS[idx];
+    const w = weeks[idx];
     rangeEl.textContent = w.label;
-
     tbody.innerHTML = '';
     const tot = [0,0,0,0,0];
+
     for (const r of w.rows){
       const [g,o,a,c,p,t] = r;
       tot[0]+=o; tot[1]+=a; tot[2]+=c; tot[3]+=p; tot[4]+=t;
       tbody.insertAdjacentHTML('beforeend',
         `<tr>
           <td>${g}</td>
-          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(o)})">${o}</span></td>
-          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(a)})">${a}</span></td>
-          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(c)})">${c}</span></td>
-          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(p)})">${p}</span></td>
-          <td><span class="v" style="background-color:rgba(255,214,10,${getOpacity(t)})"><b>${t}</b></span></td>
+          <td>${cell(o)}</td>
+          <td>${cell(a)}</td>
+          <td>${cell(c)}</td>
+          <td>${cell(p)}</td>
+          <td>${totCell(t)}</td>
         </tr>`);
     }
 
     tfoot.innerHTML =
       `<tr>
         <td><span class='v'>Tot</span></td>
-        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[0])})">${tot[0]}</span></td>
-        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[1])})">${tot[1]}</span></td>
-        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[2])})">${tot[2]}</span></td>
-        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[3])})">${tot[3]}</span></td>
-        <td><span class='v' style="background-color:rgba(255,214,10,${getOpacity(tot[4])})"><b>${tot[4]}</b></span></td>
+        <td>${tot[0]?`<span class='tot-foot'>${tot[0]}</span>`:''}</td>
+        <td>${tot[1]?`<span class='tot-foot'>${tot[1]}</span>`:''}</td>
+        <td>${tot[2]?`<span class='tot-foot'>${tot[2]}</span>`:''}</td>
+        <td>${tot[3]?`<span class='tot-foot'>${tot[3]}</span>`:''}</td>
+        <td class="${tot[4] ? 'td-tot-week' : ''}">${tot[4] ? tot[4] : ''}</td>
       </tr>`;
 
-    // Frase “smart”: mostra solo le categorie > 0, con singolare/plurale + battuta veneta
-    summaryEl.innerHTML = (() => {
-      const parts = [];
-      const fmt = (n, one, many) => (n === 1 ? one : `${n} ${many}`);
-      if (tot[0] > 0) parts.push(fmt(tot[0], '1 oca', 'oche'));
-      if (tot[1] > 0) parts.push(fmt(tot[1], '1 anatra', 'anatre'));
-      if (tot[2] > 0) parts.push(fmt(tot[2], '1 cappone', 'capponi'));
-      if (tot[3] > 0) parts.push(fmt(tot[3], '1 pollo', 'polli'));
-      const list = parts.join(', ');
-      const joke = (Array.isArray(venetoJokes) && venetoJokes.length)
-        ? venetoJokes[Math.floor(Math.random()*venetoJokes.length)]
-        : 'Xe bon, ghe semo!';
-      return `
-        <span class="line" style="animation-delay:0ms">
-          Questa settimana al Tatone servono ${list}, per un totale di ${tot[4]} avicoli prenotati.
-        </span>
-        <br>
-        <span class="line" style="animation-delay:120ms"><em>${joke}</em></span>
-      `;
-    })();
+    const parts = [];
+    const fmt = (n, uno, molti) => n === 1 ? `1 ${uno}` : `${n} ${molti}`;
+    if (tot[0] > 0) parts.push(fmt(tot[0], 'oca', 'oche'));
+    if (tot[1] > 0) parts.push(fmt(tot[1], 'anatra', 'anatre'));
+    if (tot[2] > 0) parts.push(fmt(tot[2], 'cappone', 'capponi'));
+    if (tot[3] > 0) parts.push(fmt(tot[3], 'pollo', 'polli'));
+    const list = parts.join(', ');
+    summaryEl.innerHTML = parts.length ? `<span class="line" style="animation-delay:0ms">Questa settimana al Tatone servono ${list}, per un totale di ${tot[4]} avicoli prenotati.</span>` : '';
 
     const totalsPerDay = w.rows.map(r=>r[5]);
-    const maxVal = Math.max(...totalsPerDay);
+    const maxVal = Math.max(...totalsPerDay, 0);
     const maxIdxs = totalsPerDay.map((v,i)=>v===maxVal?i:null).filter(i=>i!==null);
     const daysStr = maxIdxs.map(i=>IT_DAYS_LONG[i]).join(', ');
     const busiest = maxIdxs.length>1
       ? `i giorni più carichi sono ${daysStr} con ${maxVal} capi.`
       : `il giorno più carico è ${daysStr} con ${maxVal} capi.`;
-    const avg = itNum(tot[4]/7,1);
-    const prepHours = Math.round((tot[4]*20)/60);
+    const avg = (tot[4]/7).toFixed(1).replace('.',',');
 
-    statsEl.innerHTML =
-      `<span class="line" style="animation-delay:300ms">
-        La media giornaliera è di ${avg} capi, ${busiest} Tempo totale settimanale di preparazione: ${prepHours} ore (calcolo 20 minuti ad avicolo).
-      </span>`;
+    statsEl.innerHTML = maxVal>0 ? `<span class="line" style="animation-delay:300ms">La media giornaliera è di ${avg} capi, ${busiest}</span>` : '';
 
     let perc = 0;
     if (idx > 0) {
-      const prevTot = WEEKS[idx-1].rows.reduce((a,r)=>a+r[5],0);
+      const prevTot = weeks[idx-1].rows.reduce((a,r)=>a+r[5],0);
       if (prevTot > 0) perc = Math.round(((tot[4]-prevTot)/prevTot)*100);
     }
-    const deltaTxt = `${perc>=0?`+${perc}%`:`${perc}%`} rispetto alla settimana precedente`;
-
-    const joke2=(Math.random()<0.33)?` <em style=\"opacity:.85\">${"Xe bon, ghe semo!"}</em>`:'';
-    deltaEl.innerHTML = `<span class="line" style="animation-delay:600ms">${deltaTxt}${joke2}</span>`;
+    deltaEl.innerHTML = `<span class="line" style="animation-delay:600ms">${perc>=0?`+${perc}%`:`${perc}%`} rispetto alla settimana precedente</span>`;
 
     const atStart = (idx === 0);
-    const atEnd = (idx === WEEKS.length - 1);
+    const atEnd = (idx === weeks.length - 1);
     const prevBtnEl = document.getElementById('prev');
     const nextBtnEl = document.getElementById('next');
     prevBtnEl.disabled = atStart; nextBtnEl.disabled = atEnd;
@@ -592,7 +516,7 @@ function renderAgenda(weeks){
     nextBtnEl.setAttribute('aria-disabled', String(atEnd));
   }
 
-  function go(delta){ idx = Math.min(Math.max(idx + delta, 0), WEEKS.length - 1); renderWeek(); }
+  function go(delta){ idx = Math.min(Math.max(idx + delta, 0), weeks.length - 1); renderWeek(); }
   document.getElementById('prev').onclick = ()=>go(-1);
   document.getElementById('next').onclick = ()=>go(1);
   window.addEventListener('keydown', e=>{ if(e.key==='ArrowLeft') go(-1); else if(e.key==='ArrowRight') go(1); });
@@ -607,7 +531,7 @@ function renderPrenotati(rem){
   const setRow = (cls, value) => {
     const row = container.querySelector(`.${cls}.row`);
     if (!row) return;
-    const val = Math.ceil(value || 0); // <<< arrotondamento per eccesso
+    const val = Math.ceil(value || 0);
     row.dataset.val = String(val);
     const valEl = row.querySelector('.val'); if (valEl) valEl.textContent = String(val);
   };
@@ -619,7 +543,7 @@ function renderPrenotati(rem){
     setRow("polli", rem.p);
     const totalEl = container.querySelector('.ribbon .count');
     if (totalEl){
-      totalEl.textContent = String(Math.ceil(rem.total)); // <<< arrotondamento per eccesso
+      totalEl.textContent = String(Math.ceil(rem.total));
       totalEl.setAttribute('title', `O:${rem.o} A:${rem.a} C:${rem.c} P:${rem.p}`);
     }
   }
@@ -641,7 +565,7 @@ function renderPrenotati(rem){
 }
 
 function renderAvanzamento(years, grandTotal, catTotals){
-  const RECORD = 204; // fisso
+  const RECORD = 204;
   const data = {
     y2023: { Oche:71, Anatre:26, Capponi:87, Polli:20 },
     y2024: { Oche:73, Anatre:23, Capponi:71, Polli:21 },
@@ -744,16 +668,13 @@ function runSelfTests(){
   runSelfTests();
   try{
     const { recs, totalAll, totalsByCat } = await loadData();
-    const weeks = buildWeeks(recs);
+    const weeks = buildWeeksAllYear(recs);
     renderAgenda(weeks);
-
     const remaining = buildRemaining(recs, new Date());
-    renderPrenotati(remaining); // Blocco 2 con CEIL
-
+    renderPrenotati(remaining);
     renderAvanzamento(null, totalAll, totalsByCat);
   } catch ( err ){
-    console.warn("Dati CSV non disponibili o incompleti, uso i demo:", err);
-    renderAgenda([]);
+    renderAgenda(buildWeeksAllYear([]));
     renderPrenotati({o:0,a:0,c:0,p:0,total:0});
     renderAvanzamento(null, undefined, null);
   }
