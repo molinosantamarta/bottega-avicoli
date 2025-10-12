@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Dashboard Avicoli — Blocchi Integrati</title>
+<title>Ocapì — Avicoli Macello 2025</title>
 
 <style>
 body::before { content: ""; display: block; height: 40px; }
 :root{ --container-w: min(96vw, 1200px); }
 html, body { height:100%; }
 body{
-  margin:0; background:#0a0a0b; color:#f5f5f7;
+  margin:0; background:#770505; color:#f5f5f7;
   font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
 .block { padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; }
-.block + .block { border-top:1px solid #232429; margin-top:8px; padding-top:24px; }
+
 .block h1.block-title{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 </style>
 
@@ -26,7 +26,7 @@ body{
 <style>
   #agenda { --bg:#0b0b0c; --panel:#16181c; --border:#2b2d31; --text:#f5f5f7; --accent:#ffd60a; --muted:#9ea1a5; --radius:10px; --shadow:0 6px 18px rgba(0,0,0,.35);
             --tot-week-bg:#ffd60a; --tot-week-text:#000; }
-  #agenda .a-root{background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;}
+  #agenda .a-root{background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; gap:15px; width:100%;border-radius: 14px}
   #agenda .a-root h1{font-size:18px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin:0;display:flex;align-items:center;gap:8px}
 
   #agenda .week-nav{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px 10px;box-shadow:var(--shadow)}
@@ -174,7 +174,6 @@ body{
 </style>
 </head>
 <body>
-
 <section id="agenda" class="block" aria-labelledby="bl1">
   <h1 id="bl1" class="block-title">Blocco 1 • Agenda macellazione</h1>
   <div class="a-root" aria-label="Agenda macellazione">
@@ -716,8 +715,8 @@ function initLottie(){
 })();
 </script>
 
-<footer style="text-align:center;padding:24px 0;font-size:12px;color:#a7abb1;letter-spacing:.3px;border-top:1px solid #232429;margin-top:40px;">
-  <em>© Ocapì – La Bottega di Casterno 2025 – tutti i diritti riservati</em>
+<footer style="text-align:center;padding:24px 0;font-size:10px;color:#f6f6f7;letter-spacing:.3px;margin-top:40px;">
+  <em><strong>© Ocapì – La Bottega di Casterno 2025 – by PePe</strong></em>
 </footer>
 
 </body>
