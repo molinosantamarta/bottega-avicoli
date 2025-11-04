@@ -38,7 +38,10 @@ body{
   #agenda .btn:active{transform:translateY(1px)}
   #agenda .range{font-weight:800;letter-spacing:.3px}
 
-  #agenda .table-wrap{width:100%;max-width:var(--container-w);background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;border:1px solid var(--border)}
+  #agenda .table-wrap{
+  width:100%;
+  max-width:var(--container-w);
+  background:transparent; border-radius:0; box-shadow:none; overflow-x:auto; border:none;}
   #agenda table{width:100%;border-collapse:collapse;text-align:center;font-size:13px;table-layout:fixed}
   #agenda th,#agenda td{padding:6px 3px;border-bottom:1px solid var(--border);border-right:1px solid rgba(255,255,255,0.05);white-space:nowrap;text-align:center;vertical-align:middle}
   #agenda tr td:last-child, #agenda tr th:last-child{border-right:none}
@@ -57,6 +60,12 @@ body{
   }
 
   #agenda .summary{max-width:var(--container-w);width:100%;color:#9ea1a5;font-size:15px;text-align:center;line-height:1.6;margin-top:8px;font-weight:700}
+  /* Nasconde i paragrafi del riassunto quando sono vuoti */
+#agenda .summary:empty {
+  display: none;
+  margin: 0 !important;
+  padding: 0 !important;
+}
   #agenda .summary .line{opacity:0;transform:translateY(6px);filter:blur(2px);display:inline-block;
     animation:fadeUpAgenda .6s forwards cubic-bezier(.22,.72,.24,1), shimmer 2.6s ease-in-out infinite .4s;
     background:linear-gradient(90deg, rgba(255,255,255,.25) 0%, rgba(255,255,255,.85) 50%, rgba(255,255,255,.25) 100%);
@@ -568,7 +577,10 @@ function renderAgenda(weeks){
       }
     }
     deltaEl.innerHTML = deltaHtml;
-
+// Nasconde i paragrafi vuoti per non lasciare spazio
+summaryEl.hidden = !summaryEl.textContent.trim();
+statsEl.hidden   = !statsEl.textContent.trim();
+deltaEl.hidden   = !deltaEl.textContent.trim();
     const atStart = (idx === 0);
     const atEnd = (idx === weeks.length - 1);
     const prevBtnEl = document.getElementById('prev');
@@ -783,7 +795,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <footer style="text-align:center;padding:24px 0;font-size:10px;color:#f6f6f7;letter-spacing:.3px;margin-top:40px;">
-  <strong>© Ocapì – La Bottega di Casterno 2025 – designed by pepesprojects.com </strong>
+  <strong>© Ocapì – La Bottega di Casterno 2025 – creata da P3P3 </strong>
 </footer>
 
 </body>
