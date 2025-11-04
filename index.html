@@ -191,7 +191,7 @@ body{
 body::before { content:""; display:block; height:130px; } /* lascia spazio sotto la barra */
 
 .topbar {
-  position:fixed; top:0; left:0; right:0; height:130px;
+  position:fixed; top:0; left:0; right:0; height:135px;
   display:flex; align-items:center; justify-content:center;
   background:linear-gradient(180deg, rgba(10,10,11,.8), rgba(10,10,11,.55));
   backdrop-filter:blur(10px) saturate(140%);
@@ -274,7 +274,7 @@ body::before { content:""; display:block; height:130px; } /* lascia spazio sotto
       <table id="tabella">
         <thead>
           <tr>
-            <th>Giorno</th><th>Oche</th><th>Anatre</th><th>Capp</th><th>Polli</th><th>Tot</th>
+            <th></th><th>Oche</th><th>Anatre</th><th>Capp</th><th>Polli</th><th>Tot</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -810,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hh = now.getHours().toString().padStart(2,"0");
     const mm = now.getMinutes().toString().padStart(2,"0");
     sub.innerHTML = `<span class="blink"></span>ultimo aggiornamento: oggi, ${hh}:${mm}`;
-  }, 3000);
+  }, 6000);
 });
 </script>
 
