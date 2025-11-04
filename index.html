@@ -10,6 +10,10 @@
 <style>
 body::before { content: ""; display: block; height: 40px; }
 :root{ --container-w: min(96vw, 1200px); }
+:root {
+  --container-w: min(96vw, 1200px);
+  --font-scale: 1.12; /* incremento generale del 12% */
+}
 html, body { height:100%; }
 body{
   margin:0; background:#000; color:#f5f5f7;
@@ -184,10 +188,10 @@ body{
   @keyframes dotBlink{from{opacity:.45;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 </style><style>
 /* Barra superiore “Ocapì” */
-body::before { content:""; display:block; height:100px; } /* lascia spazio sotto la barra */
+body::before { content:""; display:block; height:150px; } /* lascia spazio sotto la barra */
 
 .topbar {
-  position:fixed; top:0; left:0; right:0; height:92px;
+  position:fixed; top:0; left:0; right:0; height:150px;
   display:flex; align-items:center; justify-content:center;
   background:linear-gradient(180deg, rgba(10,10,11,.8), rgba(10,10,11,.55));
   backdrop-filter:blur(10px) saturate(140%);
@@ -198,10 +202,10 @@ body::before { content:""; display:block; height:100px; } /* lascia spazio sotto
 .brand-title {
   font-family:"Cairo Play", -apple-system, system-ui, Segoe UI, Roboto, sans-serif;
   font-weight:900; font-size:46px; color:#f2cf57; text-transform:uppercase;
-  text-shadow:0 1px 0 #000, 0 0 10px rgba(242,207,87,.18);
+  text-shadow:0 1px 0 #000, 0 0 10px rgba(242,207,87,.18); padding-top:50px;
 }
 .brand-title span {
-  display:inline-block; transform:translateY(14px) scale(.92); opacity:0;
+  display:inline-block; transform:translateY(64px) scale(.92); opacity:0;
   animation:letterUp .6s cubic-bezier(.22,.72,.24,1) forwards;
 }
 .brand-title span:nth-child(1){animation-delay:.05s}
@@ -225,6 +229,22 @@ body::before { content:""; display:block; height:100px; } /* lascia spazio sotto
   margin-right:6px; animation:blink .9s infinite alternate;
 }
 @keyframes blink { from{opacity:.5;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+/* Migliora leggibilità testi piccoli */
+#agenda table { font-size: calc(13px * var(--font-scale)); }
+#agenda th { font-size: calc(11px * var(--font-scale)); }
+#agenda .range { font-size: calc(14px * var(--font-scale)); }
+#agenda .summary { font-size: calc(15px * var(--font-scale)); }
+
+[data-ocapi] .lbl { font-size: calc(16px * var(--font-scale)); }
+[data-ocapi] .val { font-size: calc(20px * var(--font-scale)); }
+[data-ocapi] .ribbon .label { font-size: calc(14px * var(--font-scale)); }
+[data-ocapi] .ribbon .count { font-size: calc(22px * var(--font-scale)); }
+
+#avanz .row .name { font-size: calc(14px * var(--font-scale)); }
+#avanz .tot-row .lbl { font-size: calc(13px * var(--font-scale)); }
+#avanz .tot-row .val { font-size: calc(26px * var(--font-scale)); }
+#avanz .barline .tag { font-size: calc(13px * var(--font-scale)); }
+#avanz .note { font-size: calc(11px * var(--font-scale)); }
 </style>
 </head>
 <body>
