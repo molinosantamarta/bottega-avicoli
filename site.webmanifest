@@ -1,20 +1,17 @@
 {
-  "name": "Ocapì - Avicoli Macello",
-  "short_name": "Ocapì",
+  "name": "OCAPì - Avicoli Macello",
+  "short_name": "OCAPì",
   "start_url": "/bottega-avicoli/index.html",
+  "scope": "/bottega-avicoli/",
   "display": "standalone",
   "background_color": "#770505",
   "theme_color": "#770505",
   "icons": [
     {
-      "src": "icon-186x186.png",
-      "sizes": "186x186",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-496x496.png",
-      "sizes": "496x496",
-      "type": "image/png"
+      "src": "/bottega-avicoli/ocapi-logo.png",
+      "sizes": "800x800",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
