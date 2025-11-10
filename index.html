@@ -455,11 +455,19 @@ async function loadData(){
   if (idx.cap    < 0) idx.cap    = 3;
   if (idx.polli  < 0) idx.polli  = 4;
 
+  // >>> Somme su valori grezzi (decimali), niente arrotondamenti qui
   const recs = body.map(r=>{
     const d = parseDate(r[idx.data]); if (!d) return null;
-    return { date:d, o:toNumberIT(r[idx.oche])|0, a:toNumberIT(r[idx.anatre])|0, c:toNumberIT(r[idx.cap])|0, p:toNumberIT(r[idx.polli])|0 };
+    return {
+      date: d,
+      o: toNumberIT(r[idx.oche]),
+      a: toNumberIT(r[idx.anatre]),
+      c: toNumberIT(r[idx.cap]),
+      p: toNumberIT(r[idx.polli])
+    };
   }).filter(Boolean).sort((A,B)=>A.date-B.date);
 
+  // Totali per categoria e complessivo su grezzi, arrotondamento SOLO alla fine
   let totalAllFloat = 0;
   const totalsByCatFloat = { Oche:0, Anatre:0, Capponi:0, Polli:0 };
   for (const r of body){
@@ -473,12 +481,12 @@ async function loadData(){
     totalsByCatFloat.Capponi+= c;
     totalsByCatFloat.Polli  += p;
   }
-  const totalAll = Math.round(totalAllFloat);
+  const totalAll = Math.ceil(totalAllFloat);
   const totalsByCat = {
-    Oche:    Math.round(totalsByCatFloat.Oche),
-    Anatre:  Math.round(totalsByCatFloat.Anatre),
-    Capponi: Math.round(totalsByCatFloat.Capponi),
-    Polli:   Math.round(totalsByCatFloat.Polli),
+    Oche:    Math.ceil(totalsByCatFloat.Oche),
+    Anatre:  Math.ceil(totalsByCatFloat.Anatre),
+    Capponi: Math.ceil(totalsByCatFloat.Capponi),
+    Polli:   Math.ceil(totalsByCatFloat.Polli),
   };
 
   return { recs, totalAll, totalsByCat };
@@ -510,7 +518,7 @@ function buildWeeksAllYear(recs){
     const rows = w.days.map((d, i) => {
       const dd = addDays(w.mon,i);
       const label = `${IT_DAYS_SHORT[i]} ${dd.getDate()}`;
-      const tot = d.o + d.a + d.c + d.p;
+      const tot = d.o + d.a + d.c + d.p; // grezzo
       return [label, d.o, d.a, d.c, d.p, tot];
     });
     return { label: formatWeekLabel(w.mon), key: w.mon.toISOString().slice(0,10), mon: w.mon, rows };
@@ -524,9 +532,9 @@ function buildRemaining(recs, today=new Date()){
   let O=0, A=0, C=0, P=0;
   for (const r of recs){
     const rd = new Date(r.date.getFullYear(), r.date.getMonth(), r.date.getDate());
-    if (rd >= t0){ O += r.o; A += r.a; C += r.c; P += r.p; }
+    if (rd >= t0){ O += r.o; A += r.a; C += r.c; P += r.p; } // somma grezza
   }
-  return { o:O, a:A, c:C, p:P, total: O + A + C + P };
+  return { o:O, a:A, c:C, p:P, total: O + A + C + P }; // ritorna valori grezzi
 }
 
 function renderAgenda(weeks){
@@ -540,8 +548,9 @@ function renderAgenda(weeks){
 
   if (localStorage.getItem("agendaGlowDone")) document.body.classList.add("no-glow"); else localStorage.setItem("agendaGlowDone", "1");
 
-  const cell = v => v ? `<span class="v" style="background-color:rgba(255,214,10,${getOpacity(v)})">${v}</span>` : '';
-  const totCell = v => v ? `<span class="tot">${v}</span>` : '';
+  // Arrotonda SOLO in output
+  const cell = v => v ? `<span class="v" style="background-color:rgba(255,214,10,${getOpacity(v)})">${Math.ceil(v)}</span>` : '';
+  const totCell = v => v ? `<span class="tot">${Math.ceil(v)}</span>` : '';
 
   const todayKey = mondayOf(new Date()).toISOString().slice(0,10);
   let idx = weeks.findIndex(w => w.key === todayKey);
@@ -551,10 +560,10 @@ function renderAgenda(weeks){
     const w = weeks[idx];
     rangeEl.textContent = w.label;
     tbody.innerHTML = '';
-    const tot = [0,0,0,0,0];
+    const tot = [0,0,0,0,0]; // accumulatori grezzi
 
     for (const r of w.rows){
-      const [g,o,a,c,p,t] = r;
+      const [g,o,a,c,p,t] = r; // valori grezzi
       tot[0]+=o; tot[1]+=a; tot[2]+=c; tot[3]+=p; tot[4]+=t;
       tbody.insertAdjacentHTML('beforeend',
         `<tr>
@@ -570,46 +579,48 @@ function renderAgenda(weeks){
     tfoot.innerHTML =
       `<tr>
         <td><span class='v'>Tot</span></td>
-        <td>${tot[0]?`<span class='tot-foot'>${tot[0]}</span>`:''}</td>
-        <td>${tot[1]?`<span class='tot-foot'>${tot[1]}</span>`:''}</td>
-        <td>${tot[2]?`<span class='tot-foot'>${tot[2]}</span>`:''}</td>
-        <td>${tot[3]?`<span class='tot-foot'>${tot[3]}</span>`:''}</td>
-        <td class="${tot[4] ? 'td-tot-week' : ''}">${tot[4] ? tot[4] : ''}</td>
+        <td>${tot[0]?`<span class='tot-foot'>${Math.ceil(tot[0])}</span>`:''}</td>
+        <td>${tot[1]?`<span class='tot-foot'>${Math.ceil(tot[1])}</span>`:''}</td>
+        <td>${tot[2]?`<span class='tot-foot'>${Math.ceil(tot[2])}</span>`:''}</td>
+        <td>${tot[3]?`<span class='tot-foot'>${Math.ceil(tot[3])}</span>`:''}</td>
+        <td class="${tot[4] ? 'td-tot-week' : ''}">${tot[4] ? Math.ceil(tot[4]) : ''}</td>
       </tr>`;
 
     const parts = [];
-    const fmt = (n, uno, molti) => n === 1 ? `1 ${uno}` : `${n} ${molti}`;
+    const fmt = (n, uno, molti) => Math.ceil(n) === 1 ? `1 ${uno}` : `${Math.ceil(n)} ${molti}`;
     if (tot[0] > 0) parts.push(fmt(tot[0], 'oca', 'oche'));
     if (tot[1] > 0) parts.push(fmt(tot[1], 'anatra', 'anatre'));
     if (tot[2] > 0) parts.push(fmt(tot[2], 'cappone', 'capponi'));
     if (tot[3] > 0) parts.push(fmt(tot[3], 'pollo', 'polli'));
     const list = parts.join(', ');
-    summaryEl.innerHTML = parts.length ? `<span class="line" style="animation-delay:0ms">Questa settimana al Tatone servono ${list}, per un totale di ${tot[4]} avicoli prenotati.</span>` : '';
+    summaryEl.innerHTML = parts.length ? `<span class="line" style="animation-delay:0ms">Questa settimana al Tatone servono ${list}, per un totale di ${Math.ceil(tot[4])} avicoli prenotati.</span>` : '';
 
-    const totalsPerDay = w.rows.map(r=>r[5]);
+    const totalsPerDay = w.rows.map(r=>r[5]); // grezzi
     const maxVal = Math.max(...totalsPerDay, 0);
     const maxIdxs = totalsPerDay.map((v,i)=>v===maxVal?i:null).filter(i=>i!==null);
     const daysStr = maxIdxs.map(i=>IT_DAYS_LONG[i]).join(', ');
     const busiest = maxIdxs.length>1
-      ? `i giorni più carichi sono ${daysStr} con ${maxVal} capi.`
-      : `il giorno più carico è ${daysStr} con ${maxVal} capi.`;
+      ? `i giorni più carichi sono ${daysStr} con ${Math.ceil(maxVal)} capi.`
+      : `il giorno più carico è ${daysStr} con ${Math.ceil(maxVal)} capi.`;
     const avg = (tot[4]/7).toFixed(1).replace('.',',');
 
     statsEl.innerHTML = maxVal>0 ? `<span class="line" style="animation-delay:300ms">La media giornaliera è di ${avg} capi, ${busiest}</span>` : '';
 
     let deltaHtml = '';
     if (idx > 0 && tot[4] > 0) {
-      const prevTot = weeks[idx-1].rows.reduce((a,r)=>a+r[5],0);
+      const prevTot = weeks[idx-1].rows.reduce((a,r)=>a+r[5],0); // grezzo
       if (prevTot > 0) {
         const perc = Math.round(((tot[4]-prevTot)/prevTot)*100);
         if (perc !== 0) deltaHtml = `<span class="line" style="animation-delay:600ms">${perc>=0?`+${perc}%`:`${perc}%`} rispetto alla settimana precedente</span>`;
       }
     }
     deltaEl.innerHTML = deltaHtml;
-// Nasconde i paragrafi vuoti per non lasciare spazio
-summaryEl.hidden = !summaryEl.textContent.trim();
-statsEl.hidden   = !statsEl.textContent.trim();
-deltaEl.hidden   = !deltaEl.textContent.trim();
+
+    // Nasconde i paragrafi vuoti per non lasciare spazio
+    summaryEl.hidden = !summaryEl.textContent.trim();
+    statsEl.hidden   = !statsEl.textContent.trim();
+    deltaEl.hidden   = !deltaEl.textContent.trim();
+
     const atStart = (idx === 0);
     const atEnd = (idx === weeks.length - 1);
     const prevBtnEl = document.getElementById('prev');
@@ -634,7 +645,7 @@ function renderPrenotati(rem){
   const setRow = (cls, value) => {
     const row = container.querySelector(`.${cls}.row`);
     if (!row) return;
-    const val = Math.ceil(value || 0);
+    const val = Math.ceil(value || 0); // arrotonda solo in output
     row.dataset.val = String(val);
     const valEl = row.querySelector('.val'); if (valEl) valEl.textContent = String(val);
   };
@@ -646,7 +657,7 @@ function renderPrenotati(rem){
     setRow("polli", rem.p);
     const totalEl = container.querySelector('.ribbon .count');
     if (totalEl){
-      totalEl.textContent = String(Math.ceil(rem.total));
+      totalEl.textContent = String(Math.ceil(rem.total)); // output arrotondato
       totalEl.setAttribute('title', `O:${rem.o} A:${rem.a} C:${rem.c} P:${rem.p}`);
     }
   }
@@ -685,7 +696,7 @@ function renderAvanzamento(years, grandTotal, catTotals){
   const totEl = document.getElementById('tot2025');
   const progFill = document.getElementById('progFill');
   const capRecordEl = document.getElementById('capRecord');
-  if (totEl) totEl.textContent = String(totalAll);
+  if (totEl) totEl.textContent = String(totalAll); // già arrotondato in loadData
   if (capRecordEl) capRecordEl.textContent = String(RECORD);
 
   const pctTot = Math.max(0, Math.min(100, (totalAll / RECORD) * 100));
